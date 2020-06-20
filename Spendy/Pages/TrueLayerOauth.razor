@@ -1,0 +1,24 @@
+﻿@page "/truelayer/oauth"
+
+@inject NavigationManager NavigationManager
+@inject BankingService BankingService
+@using Microsoft.AspNetCore.WebUtilities
+
+<h3>TrueLayer Oauth Callback</h3>
+
+<div>Please wait while we redirect you...</div>
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        var success = query.TryGetValue("code", out var code);
+
+        await BankingService.GenerateAccessTokenAsync(code);
+
+        NavigationManager.NavigateTo("/dashboard");
+    }
+}

@@ -1,0 +1,52 @@
+﻿@page "/dashboard/{providerId}/account/{accountId}"
+
+@inject BankingService BankingService
+
+<h3>Account</h3>
+
+@if (balance == null && transactions == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    if (balance != null)
+    {
+        <div class="account-balance">
+            <p>Available balance: @balance.Available</p>
+            <p>Current: @balance.Current</p>
+            <p>Overdraft: @balance.Overdraft</p>
+        </div>
+    }
+
+    if (transactions != null)
+    {
+        foreach (var transaction in transactions)
+        {
+            <div class="account-transaction">
+                <p title="@transaction.Timestamp.ToString("G")">Time: @transaction.Timestamp.ToString("d MMM yyyy")</p>
+                <p>Description: @transaction.Description</p>
+                <p>Type: @transaction.TransactionType</p>
+                <p>Category: @transaction.TransactionCategory</p>
+                <p>Classification: @string.Join(",", transaction.TransactionClassification)</p>
+            </div>
+        }
+    }
+}
+
+@code {
+    private Balance balance;
+    private Transaction[] transactions;
+
+    [Parameter]
+    public string ProviderId { get; set; }
+
+    [Parameter]
+    public string AccountId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        balance = await BankingService.GetBalance(ProviderId, AccountId);
+        transactions = await BankingService.GetTransactions(ProviderId, AccountId);
+    }
+}

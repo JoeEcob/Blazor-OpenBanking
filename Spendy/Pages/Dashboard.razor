@@ -1,0 +1,53 @@
+﻿@page "/dashboard"
+
+@inject BankingService BankingService
+
+<h1>Dashboard</h1>
+
+@if (!isLoading)
+{
+    <a href=@BankingService.GetAuthUrl()>Connect bank account</a>
+}
+
+@if (isLoading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    foreach (var provider in providers)
+    {
+        if (!accountsByProvider.TryGetValue(provider.ProviderId, out var accounts))
+        {
+            continue;
+        }
+
+        foreach (var account in accounts)
+        {
+            <div class="account">
+                <p>Name: @account.DisplayName</p>
+                <p>Type: @account.AccountType</p>
+
+                @{var targetUrl = $"/dashboard/{provider.ProviderId}/account/{account.AccountId}";}
+                <NavLink href=@targetUrl>Go to Account</NavLink>
+            </div>
+        }
+    }
+}
+
+@code {
+    private bool isLoading = true;
+    private Provider[] providers;
+    private Dictionary<string, Account[]> accountsByProvider = new Dictionary<string, Account[]>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = false;
+        providers = BankingService.GetProviders();
+
+        foreach (var provider in providers)
+        {
+            accountsByProvider.Add(provider.ProviderId, await BankingService.GetAccounts(provider.ProviderId));
+        }
+    }
+}

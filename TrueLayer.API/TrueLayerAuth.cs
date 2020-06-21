@@ -9,7 +9,7 @@
     public class TrueLayerAuth
     {
         private readonly HttpClient _authClient;
-        private static readonly string AuthURL = "https://auth.truelayer-sandbox.com";
+        private readonly string AuthURL;
         private static readonly string RedirectURL = "https://localhost:44353/truelayer/oauth";
         private static readonly bool EnableMock = true;
         private readonly string ClientId;
@@ -18,6 +18,7 @@
         public TrueLayerAuth(IConfiguration config, IHttpClientFactory httpClientFactory)
         {
             _authClient = httpClientFactory.CreateClient();
+            AuthURL = config["TrueLayer:AuthUrl"];
             ClientId = config["TrueLayer:ClientId"];
             ClientSecret = config["TrueLayer:ClientSecret"];
         }

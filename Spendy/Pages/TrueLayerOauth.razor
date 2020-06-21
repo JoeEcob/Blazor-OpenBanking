@@ -15,10 +15,11 @@
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
 
         var query = QueryHelpers.ParseQuery(uri.Query);
-        var success = query.TryGetValue("code", out var code);
+        if (query.TryGetValue("code", out var code))
+        {
+            await BankingService.GenerateAccessTokenAsync(code);
 
-        await BankingService.GenerateAccessTokenAsync(code);
-
-        NavigationManager.NavigateTo("/dashboard");
+            NavigationManager.NavigateTo("/dashboard");
+        }
     }
 }

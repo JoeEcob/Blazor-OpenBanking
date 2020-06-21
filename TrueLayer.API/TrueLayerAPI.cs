@@ -1,5 +1,6 @@
 ﻿namespace TrueLayer.API
 {
+    using Microsoft.Extensions.Configuration;
     using System;
     using System.Linq;
     using System.Net.Http;
@@ -10,11 +11,12 @@
     public class TrueLayerAPI
     {
         private readonly HttpClient _apiClient;
-        private static readonly string ApiURL = "https://api.truelayer-sandbox.com";
+        private readonly string ApiURL;
 
-        public TrueLayerAPI(IHttpClientFactory httpClientFactory)
+        public TrueLayerAPI(IConfiguration config, IHttpClientFactory httpClientFactory)
         {
             _apiClient = httpClientFactory.CreateClient();
+            ApiURL = config["TrueLayer:ApiUrl"];
         }
 
         public async Task<string> GetProviderName(string accessToken)

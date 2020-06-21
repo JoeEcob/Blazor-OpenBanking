@@ -17,7 +17,7 @@
             _apiClient = httpClientFactory.CreateClient();
         }
 
-        public async Task<string> GetProviderId(string accessToken)
+        public async Task<string> GetProviderName(string accessToken)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/me");
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
@@ -26,9 +26,9 @@
 
             var tokenInfo = await HandleResponse<AccessTokenMetadata>(response);
 
-            tokenInfo.Results.Single().Provider.TryGetValue("provider_id", out var providerId);
+            tokenInfo.Results.Single().Provider.TryGetValue("provider_id", out var providerName);
 
-            return providerId;
+            return providerName;
         }
 
         public async Task<ApiResponse<Account>> GetAccounts(string accessToken)

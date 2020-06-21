@@ -1,5 +1,6 @@
 ﻿namespace TrueLayer.API
 {
+    using Microsoft.Extensions.Configuration;
     using System.Net.Http;
     using System.Text.Json;
     using System.Threading.Tasks;
@@ -11,12 +12,14 @@
         private static readonly string AuthURL = "https://auth.truelayer-sandbox.com";
         private static readonly string RedirectURL = "https://localhost:44353/truelayer/oauth";
         private static readonly bool EnableMock = true;
-        private static readonly string ClientId = ""; // TODO
-        private static readonly string ClientSecret = ""; // TODO
+        private readonly string ClientId;
+        private readonly string ClientSecret;
 
-        public TrueLayerAuth(IHttpClientFactory httpClientFactory)
+        public TrueLayerAuth(IConfiguration config, IHttpClientFactory httpClientFactory)
         {
             _authClient = httpClientFactory.CreateClient();
+            ClientId = config["TrueLayer:ClientId"];
+            ClientSecret = config["TrueLayer:ClientSecret"];
         }
 
         public string GetAuthUrl()

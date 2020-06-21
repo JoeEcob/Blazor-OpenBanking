@@ -25,20 +25,20 @@
             return collection.FindOne(predicate);
         }
 
-        public void UpdateInCollection<T>(string id, T itemToUpdate)
+        public void Update<T>(ObjectId id, T itemToUpdate)
         {
             using var db = new LiteDatabase(DBPath);
             var collection = db.GetCollection<T>(typeof(T).Name);
 
-            // Ensure index creates the collection if it doesn't exist
-            collection.EnsureIndex(id); // TODO - is this indexing the value rather than type?
+            collection.Update(id, itemToUpdate);
+        }
 
-            var exists = collection.Update(id, itemToUpdate);
+        public void Insert<T>(T itemToInsert)
+        {
+            using var db = new LiteDatabase(DBPath);
+            var collection = db.GetCollection<T>(typeof(T).Name);
 
-            if (!exists)
-            {
-                collection.Insert(id, itemToUpdate);
-            }
+            collection.Insert(itemToInsert);
         }
     }
 }

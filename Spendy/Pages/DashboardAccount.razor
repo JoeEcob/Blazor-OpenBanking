@@ -46,7 +46,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        balance = await BankingService.GetBalance(ProviderId, AccountId);
-        transactions = await BankingService.GetTransactions(ProviderId, AccountId);
+        var provider = new LiteDB.ObjectId(ProviderId); // TODO - move this
+        balance = await BankingService.GetBalance(provider, AccountId);
+        transactions = await BankingService.GetTransactions(provider, AccountId);
     }
 }

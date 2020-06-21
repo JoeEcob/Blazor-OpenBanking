@@ -1,9 +1,25 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
-
-<div>
-    <NavLink href="/dashboard">Go to dashboard</NavLink>
+<div class="year-progress">
+    <h2>Year Progress</h2>
+    <div class="graph-container">
+        @{ var styleAttr = $"width: {yearProgress};"; }
+        <div class="percentage" style=@styleAttr></div>
+    </div>
+    <span class="label">@yearProgress</span>
 </div>
+
+
+@code {
+    private string yearProgress;
+
+    protected override void OnInitialized()
+    {
+        var now = DateTime.Now;
+        var start = new DateTime(now.Year, 1, 1);
+        var numberOfDays = (now - start).TotalDays;
+
+        yearProgress = $"{Math.Floor(numberOfDays / 365 * 100)}%";
+    }
+}

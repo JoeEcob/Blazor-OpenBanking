@@ -2,7 +2,6 @@
 {
     using LiteDB;
     using Spendy.Data.Models;
-    using System.Collections;
     using System.Linq;
     using System.Threading.Tasks;
     using TrueLayer.API;
@@ -25,22 +24,18 @@
 
         public Provider[] GetProviders() => _dataStore.FindAll<Provider>();
 
-        public Provider GetProvider(string providerId) => _dataStore.FindOne<Provider>(x => x.ProviderId == providerId);
+        public Provider GetProvider(ObjectId providerId) => _dataStore.FindOne<Provider>(x => x.Id == providerId);
 
         public async Task GenerateAccessTokenAsync(string code)
         {
             var accessToken = await _trueLayerAuth.GetAccessTokenAsync(code);
 
-            var providerId = await _trueLayerApi.GetProviderId(accessToken.Token);
+            var providerName = await _trueLayerApi.GetProviderName(accessToken.Token);
 
-            _dataStore.UpdateInCollection(providerId, new Provider
-            {
-                ProviderId = providerId,
-                AccessToken = accessToken
-            });
+            SaveAccessToken(providerName, accessToken);
         }
 
-        public async Task<Account[]> GetAccounts(string providerId)
+        public async Task<Account[]> GetAccounts(ObjectId providerId)
         {
             var provider = GetProvider(providerId);
 
@@ -48,16 +43,14 @@
 
             if (result.ShouldAttemptRefresh)
             {
-                // TODO - remove duplication + do we need refresh elsewhere?
+                // TODO - Do we need refresh elsewhere?
                 var accessToken = await _trueLayerAuth.RefreshTokenAsync(provider.AccessToken.RefreshToken);
 
-                var updatedProviderId = await _trueLayerApi.GetProviderId(accessToken.Token);
+                // TODO - handle access token not working
 
-                _dataStore.UpdateInCollection(updatedProviderId, new Provider
-                {
-                    ProviderId = updatedProviderId,
-                    AccessToken = accessToken
-                });
+                var providerName = await _trueLayerApi.GetProviderName(accessToken.Token);
+
+                SaveAccessToken(providerName, accessToken);
 
                 result = await _trueLayerApi.GetAccounts(accessToken.Token);
             }
@@ -65,18 +58,41 @@
             return result.Results;
         }
 
-        public async Task<Balance> GetBalance(string providerId, string accountId)
+        public async Task<Balance> GetBalance(ObjectId providerId, string accountId)
         {
             var provider = GetProvider(providerId);
 
             return (await _trueLayerApi.GetBalance(provider.AccessToken.Token, accountId)).Results.FirstOrDefault();
         }
 
-        public async Task<Transaction[]> GetTransactions(string providerId, string accountId)
+        public async Task<Transaction[]> GetTransactions(ObjectId providerId, string accountId)
         {
             var provider = GetProvider(providerId);
 
             return (await _trueLayerApi.GetTransactions(provider.AccessToken.Token, accountId)).Results;
+        }
+
+        private void SaveAccessToken(string providerName, AccessToken accessToken)
+        {
+            var existingRecord = _dataStore.FindOne<Provider>(x => x.Name == providerName);
+
+            if (existingRecord != null)
+            {
+                _dataStore.Update(existingRecord.Id, new Provider
+                {
+                    Id = existingRecord.Id,
+                    Name = providerName,
+                    AccessToken = accessToken
+                });
+            }
+            else
+            {
+                _dataStore.Insert(new Provider
+                {
+                    Name = providerName,
+                    AccessToken = accessToken
+                });
+            }
         }
     }
 }

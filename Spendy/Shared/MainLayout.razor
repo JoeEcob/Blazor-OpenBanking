@@ -1,15 +1,15 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="sidebar">
-    <NavMenu />
-</div>
+<header>
+    <NavLink href="">
+        <h1>Spendy</h1>
+    </NavLink>
+    <nav>
+        <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
+        <NavLink href="/dashboard" Match="NavLinkMatch.All">Dashboard</NavLink>
+    </nav>
+</header>
 
-<div class="main">
-    <div class="top-row px-4">
-        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-    </div>
-
-    <div class="content px-4">
-        @Body
-    </div>
-</div>
+<section class="main">
+    @Body
+</section>

@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class ApiResponse<T>
+    public class TLApiResponse<T>
     {
         [JsonPropertyName("results")]
         public T[] Results { get; set; }

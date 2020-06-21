@@ -1,7 +1,7 @@
 ﻿@page "/truelayer/oauth"
 
 @inject NavigationManager NavigationManager
-@inject BankingService BankingService
+@inject BankingUpdateService BankingUpdateService
 @using Microsoft.AspNetCore.WebUtilities
 
 <h3>TrueLayer Oauth Callback</h3>
@@ -17,7 +17,7 @@
         var query = QueryHelpers.ParseQuery(uri.Query);
         if (query.TryGetValue("code", out var code))
         {
-            await BankingService.GenerateAccessTokenAsync(code);
+            await BankingUpdateService.GenerateAccessTokenAsync(code);
 
             NavigationManager.NavigateTo("/dashboard");
         }

@@ -1,7 +1,6 @@
 ﻿namespace Spendy.Data.Models
 {
     using LiteDB;
-    using TrueLayer.API.Models;
 
     public class Provider
     {
@@ -10,6 +9,8 @@
 
         public string Name { get; set; }
 
-        public AccessToken AccessToken { get; set; }
+        public string AccessToken { get; set; }
+
+        public string RefreshToken { get; set; }
     }
 }

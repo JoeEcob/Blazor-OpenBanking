@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Text.Json.Serialization;
 
-    public class Transaction
+    public class TLTransaction
     {
         [JsonPropertyName("transaction_id")]
         public string TransactionId { get; set; }

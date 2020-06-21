@@ -3,7 +3,7 @@
     using System;
     using System.Text.Json.Serialization;
 
-    public class Account
+    public class TLAccount
     {
         [JsonPropertyName("update_timestamp")]
         public DateTime UpdateTimeStamp { get; set; }

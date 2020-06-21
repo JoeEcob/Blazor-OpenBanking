@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Text.Json.Serialization;
 
-    internal class AccessTokenMetadata
+    internal class TLAccessTokenMetadata
     {
         [JsonPropertyName("consent_status")]
         public string ConsentStatus { get; set; }

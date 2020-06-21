@@ -29,6 +29,19 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-text-secondary);
 }
 
+button {
+    border: 0;
+    cursor: pointer;
+    padding: .5rem 1rem;
+}
+button:hover {
+    background-color: #ddd;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
 header {
     text-align: center;
     width: 100%;
@@ -50,11 +63,15 @@ header nav {
 header nav a {
     color: #594f4f;
     text-decoration: none;
-    padding: 0 1rem;
+    padding: .5rem 0;
+    margin: 0 1rem;
 }
-header nav a.active,
+header nav a.active {
+    border-bottom: 1px solid var(--color-text-primary);
+}
 header nav a:hover {
     color: var(--color-blue-secondary);
+    border-bottom: 1px solid var(--color-blue-secondary);
 }
 
 #blazor-error-ui {
@@ -87,4 +104,32 @@ header nav a:hover {
     margin-top: .4rem;
     margin-left: 1rem;
     vertical-align: top;
+}
+
+.dashboard .add-new {
+    margin-bottom: 2rem;
+    width: 100%;
+}
+.dashboard .flex-grid {
+    display: flex;
+}
+.dashboard-accounts {
+    flex: 1 1 30%;
+    padding-right: 1rem;
+}
+.dashboard-accounts .account {
+    padding: .5rem;
+}
+.dashboard-accounts .account:hover {
+    background-color: #ddd;
+} 
+.dashboard-transactions {
+    flex: 1 1 70%;
+}
+.dashboard-transactions .transaction {
+    background-color: #eee;
+    display: flex;
+    justify-content: space-between;
+    padding: .5rem;
+    margin-bottom: .5rem;
 }

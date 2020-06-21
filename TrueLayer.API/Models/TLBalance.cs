@@ -3,7 +3,7 @@
     using System;
     using System.Text.Json.Serialization;
 
-    public class Balance
+    public class TLBalance
     {
         [JsonPropertyName("currency")]
         public string Currency { get; set; }

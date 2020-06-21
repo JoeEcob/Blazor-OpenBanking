@@ -17,12 +17,36 @@
             return collection.FindAll().ToArray();
         }
 
+        public T[] Find<T>(Expression<Func<T, bool>> predicate)
+        {
+            using var db = new LiteDatabase(DBPath);
+            var collection = db.GetCollection<T>(typeof(T).Name);
+
+            return collection.Find(predicate).ToArray();
+        }
+
         public T FindOne<T>(Expression<Func<T, bool>> predicate)
         {
             using var db = new LiteDatabase(DBPath);
             var collection = db.GetCollection<T>(typeof(T).Name);
 
             return collection.FindOne(predicate);
+        }
+
+        public ObjectId Insert<T>(T itemToInsert)
+        {
+            using var db = new LiteDatabase(DBPath);
+            var collection = db.GetCollection<T>(typeof(T).Name);
+
+            return collection.Insert(itemToInsert);
+        }
+
+        public void InsertMany<T>(T[] itemsToInsert)
+        {
+            using var db = new LiteDatabase(DBPath);
+            var collection = db.GetCollection<T>(typeof(T).Name);
+
+            collection.Insert(itemsToInsert);
         }
 
         public void Update<T>(ObjectId id, T itemToUpdate)
@@ -33,12 +57,12 @@
             collection.Update(id, itemToUpdate);
         }
 
-        public void Insert<T>(T itemToInsert)
+        public void DeleteMany<T>(Expression<Func<T, bool>> predicate)
         {
             using var db = new LiteDatabase(DBPath);
             var collection = db.GetCollection<T>(typeof(T).Name);
 
-            collection.Insert(itemToInsert);
+            collection.DeleteMany(predicate);
         }
     }
 }

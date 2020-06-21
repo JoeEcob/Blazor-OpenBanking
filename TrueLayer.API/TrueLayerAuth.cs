@@ -30,7 +30,7 @@
             + "&providers=uk-ob-all%20uk-oauth-all"
             + (EnableMock ? "%20uk-cs-mock" : "");
 
-        public async Task<AccessToken> GetAccessTokenAsync(string code)
+        public async Task<TLAccessToken> GetAccessTokenAsync(string code)
         {
             var content = new MultipartFormDataContent
             {
@@ -46,7 +46,7 @@
             return await HandleResponse(response);
         }
 
-        public async Task<AccessToken> RefreshTokenAsync(string refreshToken)
+        public async Task<TLAccessToken> RefreshTokenAsync(string refreshToken)
         {
             var content = new MultipartFormDataContent
             {
@@ -61,12 +61,12 @@
             return await HandleResponse(response);
         }
 
-        private async Task<AccessToken> HandleResponse(HttpResponseMessage response)
+        private async Task<TLAccessToken> HandleResponse(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode)
             {
                 using var responseStream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<AccessToken>(responseStream);
+                return await JsonSerializer.DeserializeAsync<TLAccessToken>(responseStream);
             }
             else
             {

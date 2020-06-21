@@ -26,34 +26,34 @@
 
             var response = await _apiClient.SendAsync(request);
 
-            var tokenInfo = await HandleResponse<AccessTokenMetadata>(response);
+            var tokenInfo = await HandleResponse<TLAccessTokenMetadata>(response);
 
             tokenInfo.Results.Single().Provider.TryGetValue("provider_id", out var providerName);
 
             return providerName;
         }
 
-        public async Task<ApiResponse<Account>> GetAccounts(string accessToken)
+        public async Task<TLApiResponse<TLAccount>> GetAccounts(string accessToken)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/accounts");
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
 
             var response = await _apiClient.SendAsync(request);
 
-            return await HandleResponse<Account>(response);
+            return await HandleResponse<TLAccount>(response);
         }
 
-        public async Task<ApiResponse<Balance>> GetBalance(string accessToken, string accountId)
+        public async Task<TLApiResponse<TLBalance>> GetBalance(string accessToken, string accountId)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/accounts/{accountId}/balance");
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
 
             var response = await _apiClient.SendAsync(request);
 
-            return await HandleResponse<Balance>(response);
+            return await HandleResponse<TLBalance>(response);
         }
 
-        public async Task<ApiResponse<Transaction>> GetTransactions(string accessToken, string accountId, DateTime? from = null, DateTime? to = null)
+        public async Task<TLApiResponse<TLTransaction>> GetTransactions(string accessToken, string accountId, DateTime? from = null, DateTime? to = null)
         {
             var dateFilter = from != null && to != null ? $"?from={from}&to={to}" : "";
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/accounts/{accountId}/transactions{dateFilter}");
@@ -61,20 +61,20 @@
 
             var response = await _apiClient.SendAsync(request);
 
-            return await HandleResponse<Transaction>(response);
+            return await HandleResponse<TLTransaction>(response);
         }
 
-        private async Task<ApiResponse<T>> HandleResponse<T>(HttpResponseMessage response)
+        private async Task<TLApiResponse<T>> HandleResponse<T>(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode)
             {
                 using var responseStream = await response.Content.ReadAsStreamAsync();
-                var apiResponse = await JsonSerializer.DeserializeAsync<ApiResponse<T>>(responseStream);
+                var apiResponse = await JsonSerializer.DeserializeAsync<TLApiResponse<T>>(responseStream);
                 return apiResponse;
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
-                return new ApiResponse<T>
+                return new TLApiResponse<T>
                 {
                     ShouldAttemptRefresh = true
                 };

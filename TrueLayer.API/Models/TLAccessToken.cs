@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class AccessToken
+    public class TLAccessToken
     {
         [JsonPropertyName("access_token")]
         public string Token { get; set; }

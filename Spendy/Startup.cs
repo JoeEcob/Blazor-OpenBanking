@@ -25,7 +25,8 @@ namespace Spendy
             services.AddServerSideBlazor();
             services.AddHttpClient();
             services.AddSingleton<LiteDBDatastore>();
-            services.AddSingleton<BankingService>();
+            services.AddSingleton<DatabaseService>();
+            services.AddSingleton<BankingUpdateService>();
             services.AddSingleton<TrueLayerAuth>();
             services.AddSingleton<TrueLayerAPI>();
         }

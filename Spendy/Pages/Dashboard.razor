@@ -1,53 +1,86 @@
 ﻿@page "/dashboard"
 
-@inject BankingService BankingService
+@inject DatabaseService DatabaseService
+@inject BankingUpdateService BankingUpdateService
 
-<h1>Dashboard</h1>
-
-@if (!isLoading)
-{
-    <a href=@BankingService.GetAuthUrl()>Connect bank account</a>
-}
-
-@if (isLoading)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    foreach (var provider in providers)
+<div class="dashboard">
+    @if (isLoading)
     {
-        if (!accountsByProvider.TryGetValue(provider.Id.ToString(), out var accounts))
-        {
-            continue;
-        }
-
-        foreach (var account in accounts)
-        {
-            <div class="account">
-                <p>Name: @account.DisplayName</p>
-                <p>Type: @account.AccountType</p>
-
-                @{var targetUrl = $"/dashboard/{provider.Id}/account/{account.AccountId}";}
-                <NavLink href=@targetUrl>Go to Account</NavLink>
-            </div>
-        }
+        <p><em>Loading...</em></p>
     }
-}
+    else
+    {
+        <div class="add-new">
+            <button href=@BankingUpdateService.GetAuthUrl()>Add new account</button>
+        </div>
+
+        <div class="flex-grid">
+            <section class="dashboard-accounts">
+
+                <h2>Accounts</h2>
+                @foreach (var account in accounts)
+                {
+                    <div class="account clickable" @onclick="@(e => FetchTransactions(account.ProviderId, account.AccountId))">
+                        <p>@account.DisplayName</p>
+                        <p>Available: £@account.AvailableBalance</p>
+                        <p>Current: £@account.CurrentBalance</p>
+                        <p>Overdraft: £@account.Overdraft</p>
+                    </div>
+                }
+            </section>
+
+            <section class="dashboard-transactions">
+                @if (transactions != null && transactions.Length > 0)
+                {
+                    <h2>Transactions</h2>
+                    @foreach (var transaction in transactions)
+                    {
+                        <div class="transaction">
+                            <span class="date" title="@transaction.Timestamp.ToString("G")">@transaction.Timestamp.ToString("d")</span>
+                            <span class="description">@transaction.Description</span>
+                            <span class="amount">£@transaction.Amount</span>
+                        </div>
+                    }
+                }
+            </section>
+        </div>
+    }
+</div>
 
 @code {
     private bool isLoading = true;
-    private Provider[] providers;
-    private Dictionary<string, Account[]> accountsByProvider = new Dictionary<string, Account[]>();
+    private Account[] accounts;
+    private Transaction[] transactions;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = false;
-        providers = BankingService.GetProviders();
+        accounts = DatabaseService.GetAccounts();
+        transactions = new Transaction[0];
 
-        foreach (var provider in providers)
+        // TODO - update if older than x date
+        if (accounts == null || accounts.Length == 0)
         {
-            accountsByProvider.Add(provider.Id.ToString(), await BankingService.GetAccounts(provider.Id));
+            await BankingUpdateService.FetchLatestAccountInfo();
+            accounts = DatabaseService.GetAccounts();
+        }
+
+        if (accounts.Length > 0)
+        {
+            var firstAccount = accounts[0];
+            await FetchTransactions(firstAccount.ProviderId, firstAccount.AccountId);
+        }
+    }
+
+    private async Task FetchTransactions(LiteDB.ObjectId providerId, string accountId)
+    {
+        transactions = DatabaseService.GetTransactions(accountId);
+
+        // TODO - update if older than x date
+        if (transactions == null || transactions.Length == 0)
+        {
+            await BankingUpdateService.UpdateTransactions(providerId, accountId);
+            transactions = DatabaseService.GetTransactions(accountId);
         }
     }
 }

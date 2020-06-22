@@ -21,10 +21,11 @@
                 @foreach (var account in accounts)
                 {
                     <div class="account clickable" @onclick="@(e => FetchTransactions(account.ProviderId, account.AccountId, account.LastTransactionUpdate))">
-                        <p>@account.DisplayName</p>
-                        <p>Available: £@account.AvailableBalance</p>
-                        <p>Current: £@account.CurrentBalance</p>
-                        <p>Overdraft: £@account.Overdraft</p>
+                        <div class="text-wrapper">
+                            <div class="title">@account.DisplayName<span class="value">@account.CurrentBalance.ToString("C")</span></div>
+                            <div><em>Available</em><span class="value">@account.AvailableBalance.ToString("C")</span></div>
+                            <div><em>Overdraft</em><span class="value">@account.Overdraft.ToString("C")</span></div>
+                        </div>
 
                         @if (account.LogoUri != null)
                         {
@@ -40,12 +41,19 @@
                 @if (transactions != null && transactions.Length > 0)
                 {
                     <h2>Transactions</h2>
+                    int previousMonth = -1;
                     @foreach (var transaction in transactions)
                     {
+                        if (transaction.Timestamp.Month != previousMonth)
+                        {
+                            previousMonth = transaction.Timestamp.Month;
+                            <h3 class="transaction-title">@transaction.Timestamp.ToString("MMMM \\'yy")</h3>
+                        }
+
                         <div class="transaction">
                             <span class="date" title="@transaction.Timestamp.ToString("G")">@transaction.Timestamp.ToString("d")</span>
                             <span class="description">@transaction.Description</span>
-                            <span class="amount">£@transaction.Amount</span>
+                            <span class="amount">@transaction.Amount.ToString("C")</span>
                         </div>
                     }
                 }

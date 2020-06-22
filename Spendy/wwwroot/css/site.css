@@ -5,6 +5,8 @@
     --color-text-secondary: #606c76;
 }
 
+html { line-height: 1.15; }
+
 body {
     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
 }
@@ -29,9 +31,8 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-text-secondary);
 }
 
-p {
-    margin: 0 0 1rem 0;
-}
+p { margin: 0 0 1rem 0; }
+img { display: block; }
 
 button {
     border: 0;
@@ -42,9 +43,7 @@ button:hover {
     background-color: #ddd;
 }
 
-.clickable {
-    cursor: pointer;
-}
+.clickable { cursor: pointer; }
 
 header {
     text-align: center;
@@ -123,24 +122,46 @@ header nav a:hover {
 }
 .dashboard-accounts .account {
     padding: .5rem;
-    position: relative;
+    display: flex;
+    font-size: .8rem;
 }
 .dashboard-accounts .account:hover {
-    background-color: #ddd;
+    background-color: #eee;
 } 
+.dashboard-accounts .account .title {
+    flex: 1 1 100%;
+    font-size: 1rem;
+}
+.dashboard-accounts .account .text-wrapper {
+    flex: 1 1 80%;
+    padding-right: 1rem;
+    margin-bottom: 1rem;
+}
+.dashboard-accounts .account .value {
+    float: right;
+}
 .dashboard-accounts .account .account-logo {
-    position: absolute;
-    width: 50px;
-    top: .5rem;
-    right: .5rem;
+    flex: 1 1 20%;
 }
 .dashboard-transactions {
     flex: 1 1 70%;
 }
+.dashboard-transactions h2 {
+    margin: 0 0 .9rem;
+}
 .dashboard-transactions .transaction {
+    padding: .5rem .2rem;
+}
+.dashboard-transactions .transaction:hover {
     background-color: #eee;
-    display: flex;
-    justify-content: space-between;
-    padding: .5rem;
-    margin-bottom: .5rem;
+}
+.dashboard-transactions .transaction-title {
+    padding: .5rem .2rem;
+    margin: 1rem 0 0;
+}
+.dashboard-transactions .transaction .date {
+    padding-right: 1rem;
+}
+.dashboard-transactions .transaction .amount {
+    float: right;
 }

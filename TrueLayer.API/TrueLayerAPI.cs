@@ -55,7 +55,7 @@
 
         public async Task<TLApiResponse<TLTransaction>> GetTransactions(string accessToken, string accountId, DateTime? from = null, DateTime? to = null)
         {
-            var dateFilter = from != null && to != null ? $"?from={from}&to={to}" : "";
+            var dateFilter = from != null && to != null ? $"?from={from:s}&to={to:s}" : "";
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/accounts/{accountId}/transactions{dateFilter}");
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
 
@@ -82,6 +82,8 @@
             else
             {
                 // TODO - create singleton and pass error object - ErrorResponse.cs
+                using var responseStream = await response.Content.ReadAsStreamAsync();
+                var error = await JsonSerializer.DeserializeAsync<TLError>(responseStream);
                 return null;
             }
         }

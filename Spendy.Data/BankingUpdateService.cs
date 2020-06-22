@@ -27,7 +27,8 @@
         public async Task GenerateAccessTokenAsync(string code)
         {
             var accessToken = await _trueLayerAuth.GetAccessTokenAsync(code);
-            await SaveAccessToken(accessToken);
+            var provider = await SaveAccessToken(accessToken);
+            await UpdateAccounts(provider); // TODO - defer this
         }
 
         public async Task FetchLatestAccountInfo()
@@ -46,8 +47,8 @@
             // TODO - cleanup refresh
             if (newAccountInfo.ShouldAttemptRefresh)
             {
-                var newProvider = await RefreshAccessToken(provider);
-                newAccountInfo = await _trueLayerApi.GetAccounts(newProvider.AccessToken);
+                provider = await RefreshAccessToken(provider);
+                newAccountInfo = await _trueLayerApi.GetAccounts(provider.AccessToken);
             }
 
             var newAccounts = new List<Account>();
@@ -61,9 +62,11 @@
                     ProviderId = provider.Id,
                     AccountId = account.AccountId,
                     DisplayName = account.DisplayName,
+                    LogoUri = account.Provider.LogoUri,
                     AvailableBalance = balance.Available,
                     CurrentBalance = balance.Current,
-                    Overdraft = balance.Overdraft
+                    Overdraft = balance.Overdraft,
+                    LastUpdated = account.UpdateTimeStamp
                 });
             }
 
@@ -92,29 +95,44 @@
             else
             {
                 var latestTransaction = currentTransctions.OrderByDescending(x => x.Timestamp).First();
-                var recentTransactions = await _trueLayerApi.GetTransactions(provider.AccessToken, accountId, latestTransaction.Timestamp, DateTime.Now);
+                var recentTransactions = await _trueLayerApi.GetTransactions(provider.AccessToken, accountId, latestTransaction.Timestamp, DateTime.UtcNow);
                 // TODO - cleanup refresh
                 if (recentTransactions.ShouldAttemptRefresh)
                 {
                     var newProvider = await RefreshAccessToken(provider);
-                    recentTransactions = await _trueLayerApi.GetTransactions(newProvider.AccessToken, accountId, latestTransaction.Timestamp, DateTime.Now); ;
+                    recentTransactions = await _trueLayerApi.GetTransactions(newProvider.AccessToken, accountId, latestTransaction.Timestamp, DateTime.UtcNow);
                 }
                 transactionsToMap.AddRange(recentTransactions.Results);
             }
 
-            // Begin mapping
-            var newTransactions = transactionsToMap.Select(x => new Transaction
+            // Begin mapping - TODO - move this elsewhere?
+            var newTransactions = new List<Transaction>();
+            foreach (var transaction in transactionsToMap)
             {
-                AccountId = accountId,
-                TransactionId = x.TransactionId,
-                Timestamp = x.Timestamp,
-                Description = x.Description,
-                Amount = x.Amount
-            }).ToArray();
+                if (currentTransctions.Any(x => x.TransactionId == transaction.TransactionId))
+                {
+                    continue;
+                }
+
+                newTransactions.Add(new Transaction
+                {
+                    AccountId = accountId,
+                    TransactionId = transaction.TransactionId,
+                    Timestamp = transaction.Timestamp,
+                    Description = transaction.Description,
+                    Amount = transaction.Amount
+                });
+            }
 
             // Since we've done the check for existing transactions, we can insert without deleting
             // as these should all be new.
-            _dataStore.InsertMany<Transaction>(newTransactions);
+            _dataStore.InsertMany<Transaction>(newTransactions.ToArray());
+
+            // TODO - move this
+            // Update the accounts with the new fetch time
+            var account = _dataStore.FindOne<Account>(x => x.AccountId == accountId);
+            account.LastTransactionUpdate = DateTime.UtcNow;
+            _dataStore.Update(account.Id, account);
         }
 
         private async Task<Provider> RefreshAccessToken(Provider provider)

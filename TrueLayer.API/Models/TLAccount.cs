@@ -24,6 +24,6 @@
         public object AccountNumber { get; set; } // TODO
 
         [JsonPropertyName("provider")]
-        public object Provider { get; set; } // TODO
+        public TLProvider Provider { get; set; }
     }
 }

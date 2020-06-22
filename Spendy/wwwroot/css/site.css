@@ -29,6 +29,10 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-text-secondary);
 }
 
+p {
+    margin: 0 0 1rem 0;
+}
+
 button {
     border: 0;
     cursor: pointer;
@@ -119,10 +123,17 @@ header nav a:hover {
 }
 .dashboard-accounts .account {
     padding: .5rem;
+    position: relative;
 }
 .dashboard-accounts .account:hover {
     background-color: #ddd;
 } 
+.dashboard-accounts .account .account-logo {
+    position: absolute;
+    width: 50px;
+    top: .5rem;
+    right: .5rem;
+}
 .dashboard-transactions {
     flex: 1 1 70%;
 }

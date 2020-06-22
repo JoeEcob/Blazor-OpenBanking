@@ -11,7 +11,7 @@
     else
     {
         <div class="add-new">
-            <button href=@BankingUpdateService.GetAuthUrl()>Add new account</button>
+            <a href=@BankingUpdateService.GetAuthUrl()>Add new account</a>
         </div>
 
         <div class="flex-grid">
@@ -20,11 +20,18 @@
                 <h2>Accounts</h2>
                 @foreach (var account in accounts)
                 {
-                    <div class="account clickable" @onclick="@(e => FetchTransactions(account.ProviderId, account.AccountId))">
+                    <div class="account clickable" @onclick="@(e => FetchTransactions(account.ProviderId, account.AccountId, account.LastTransactionUpdate))">
                         <p>@account.DisplayName</p>
                         <p>Available: £@account.AvailableBalance</p>
                         <p>Current: £@account.CurrentBalance</p>
                         <p>Overdraft: £@account.Overdraft</p>
+
+                        @if (account.LogoUri != null)
+                        {
+                            <span class="account-logo">
+                                <img src="@account.LogoUri" />
+                            </span>
+                        }
                     </div>
                 }
             </section>
@@ -58,8 +65,7 @@
         accounts = DatabaseService.GetAccounts();
         transactions = new Transaction[0];
 
-        // TODO - update if older than x date
-        if (accounts == null || accounts.Length == 0)
+        if (accounts == null || accounts.Length == 0 || accounts.Any(x => x.LastUpdated < DateTime.UtcNow.AddDays(-1)))
         {
             await BankingUpdateService.FetchLatestAccountInfo();
             accounts = DatabaseService.GetAccounts();
@@ -68,19 +74,20 @@
         if (accounts.Length > 0)
         {
             var firstAccount = accounts[0];
-            await FetchTransactions(firstAccount.ProviderId, firstAccount.AccountId);
+            await FetchTransactions(firstAccount.ProviderId, firstAccount.AccountId, firstAccount.LastTransactionUpdate);
         }
     }
 
-    private async Task FetchTransactions(LiteDB.ObjectId providerId, string accountId)
+    private async Task FetchTransactions(LiteDB.ObjectId providerId, string accountId, DateTime lastTransactionUpdate)
     {
         transactions = DatabaseService.GetTransactions(accountId);
 
-        // TODO - update if older than x date
-        if (transactions == null || transactions.Length == 0)
+        if (transactions == null || transactions.Length == 0 || lastTransactionUpdate < DateTime.UtcNow.AddDays(-1))
         {
             await BankingUpdateService.UpdateTransactions(providerId, accountId);
             transactions = DatabaseService.GetTransactions(accountId);
+            // Need to update accounts now to get the latest transaction update time
+            accounts = DatabaseService.GetAccounts();
         }
     }
 }

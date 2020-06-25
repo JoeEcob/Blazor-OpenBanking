@@ -28,7 +28,9 @@ namespace Spendy
             services.AddSingleton<LiteDBDatastore>();
             services.AddSingleton<AuthService>();
             services.AddSingleton<AccountLoader>();
+            services.AddSingleton<CreditCardLoader>();
             services.AddSingleton<TransactionLoader>();
+            services.AddSingleton<CreditCardTransactionLoader>();
             services.AddSingleton<TrueLayerAuth>();
             services.AddSingleton<TrueLayerAPI>();
         }

@@ -25,5 +25,8 @@
 
         [JsonPropertyName("provider")]
         public TLProvider Provider { get; set; }
+
+        [JsonIgnore]
+        public TLBalance Balance { get; set; }
     }
 }

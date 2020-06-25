@@ -43,6 +43,16 @@
             return await HandleResponse<TLAccount>(response);
         }
 
+        public async Task<TLApiResponse<TLCard>> GetCards(string accessToken)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/cards");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _apiClient.SendAsync(request);
+
+            return await HandleResponse<TLCard>(response);
+        }
+
         public async Task<TLApiResponse<TLBalance>> GetBalance(string accessToken, string accountId)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/accounts/{accountId}/balance");
@@ -53,10 +63,31 @@
             return await HandleResponse<TLBalance>(response);
         }
 
+        public async Task<TLApiResponse<TLCardBalance>> GetCardBalance(string accessToken, string accountId)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/cards/{accountId}/balance");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _apiClient.SendAsync(request);
+
+            return await HandleResponse<TLCardBalance>(response);
+        }
+
         public async Task<TLApiResponse<TLTransaction>> GetTransactions(string accessToken, string accountId, DateTime? from = null, DateTime? to = null)
         {
             var dateFilter = from != null && to != null ? $"?from={from:s}&to={to:s}" : "";
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/accounts/{accountId}/transactions{dateFilter}");
+            request.Headers.Add("Authorization", $"Bearer {accessToken}");
+
+            var response = await _apiClient.SendAsync(request);
+
+            return await HandleResponse<TLTransaction>(response);
+        }
+
+        public async Task<TLApiResponse<TLTransaction>> GetCardTransactions(string accessToken, string accountId, DateTime? from = null, DateTime? to = null)
+        {
+            var dateFilter = from != null && to != null ? $"?from={from:s}&to={to:s}" : "";
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/cards/{accountId}/transactions{dateFilter}");
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
 
             var response = await _apiClient.SendAsync(request);

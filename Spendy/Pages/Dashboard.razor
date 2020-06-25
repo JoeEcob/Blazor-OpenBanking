@@ -2,7 +2,9 @@
 
 @inject AuthService _authService
 @inject AccountLoader _accountLoader
+@inject CreditCardLoader _creditCardLoader
 @inject TransactionLoader _transactionLoader
+@inject CreditCardTransactionLoader _creditCardTransactionLoader
 
 <div class="dashboard">
     @if (isLoading)
@@ -37,6 +39,24 @@
                         }
                     </div>
                 }
+
+                @foreach (var card in creditCards)
+                {
+                    var selected = card.AccountId == selectedAccountId ? "selected" : "";
+                    <div class="account clickable @selected" @onclick="@(e => FetchCardTransactions(card.ProviderId, card.AccountId))">
+                        <div class="text-wrapper">
+                            <div class="title">@card.DisplayName<span class="value">@card.CurrentBalance.ToString("C")</span></div>
+                            <div><em>Available</em><span class="value">@card.AvailableBalance.ToString("C")</span></div>
+                        </div>
+
+                        @if (card.LogoUri != null)
+                        {
+                            <span class="account-logo">
+                                <img src="@card.LogoUri" />
+                            </span>
+                        }
+                    </div>
+                }
             </section>
 
             <section class="dashboard-transactions">
@@ -67,8 +87,9 @@
 @code {
     private bool isLoading = true;
     private string selectedAccountId;
-    private Account[] accounts;
-    private Transaction[] transactions;
+    private Account[] accounts = new Account[0];
+    private Card[] creditCards = new Card[0];
+    private Transaction[] transactions = new Transaction[0];
 
     protected override async Task OnInitializedAsync()
     {
@@ -76,14 +97,21 @@
 
         // TODO - stop this getting hit twice on pre-render
         accounts = await _accountLoader.Load();
+        creditCards = await _creditCardLoader.Load();
 
         var firstAccount = accounts.First();
-        transactions = await _transactionLoader.Load(firstAccount.ProviderId, firstAccount.AccountId);
+        await FetchTransactions(firstAccount.ProviderId, firstAccount.AccountId);
     }
 
     private async Task FetchTransactions(LiteDB.ObjectId providerId, string accountId)
     {
         selectedAccountId = accountId;
         transactions = await _transactionLoader.Load(providerId, accountId);
+    }
+
+    private async Task FetchCardTransactions(LiteDB.ObjectId providerId, string accountId)
+    {
+        selectedAccountId = accountId;
+        transactions = await _creditCardTransactionLoader.Load(providerId, accountId);
     }
 }

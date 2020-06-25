@@ -43,7 +43,7 @@
                 response = await FetchApiData(provider, accountId);
             }
 
-            var translatedData = await MapToClasses(provider, response.Results, accountId);
+            var translatedData = MapToClasses(provider, response.Results, accountId);
 
             SaveToDatabase(provider, translatedData, accountId);
 
@@ -58,7 +58,7 @@
 
         protected abstract Task<TLApiResponse<T1>> FetchApiData(Provider provider, string accountId = null);
 
-        protected abstract Task<T2[]> MapToClasses(Provider provider, T1[] data, string accountId = null);
+        protected abstract T2[] MapToClasses(Provider provider, T1[] data, string accountId = null);
 
         protected abstract void SaveToDatabase(Provider provider, T2[] data, string accountId = null);
     }

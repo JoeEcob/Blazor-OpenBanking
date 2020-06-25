@@ -8,16 +8,16 @@
     using TrueLayer.API;
     using TrueLayer.API.Models;
 
-    public class TransactionLoader : Loader<TLTransaction, Transaction>
+    public class CreditCardTransactionLoader : Loader<TLTransaction, Transaction>
     {
-        public TransactionLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore)
+        public CreditCardTransactionLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore)
             : base(authService, trueLayerApi, dataStore)
         {
         }
 
         protected override DateTime GetLastUpdateTime(Provider provider, string accountId = null)
         {
-            return _dataStore.FindOne<Account>(x => x.AccountId == accountId)?.LastTransactionUpdate ?? DateTime.MinValue;
+            return _dataStore.FindOne<Card>(x => x.AccountId == accountId).LastTransactionUpdate;
         }
 
         protected override Transaction[] FetchDatabaseData(Provider provider, string accountId = null)
@@ -32,11 +32,11 @@
             if (currentTransactions?.Length > 0)
             {
                 var mostRecentTransactionDate = currentTransactions.Max(x => x.Timestamp);
-                return await _trueLayerApi.GetTransactions(provider.AccessToken, accountId, mostRecentTransactionDate, DateTime.UtcNow);
+                return await _trueLayerApi.GetCardTransactions(provider.AccessToken, accountId, mostRecentTransactionDate, DateTime.UtcNow);
             }
 
             // Otherwise we fire off a request to get everything
-            return await _trueLayerApi.GetTransactions(provider.AccessToken, accountId);
+            return await _trueLayerApi.GetCardTransactions(provider.AccessToken, accountId);
         }
 
         protected override Transaction[] MapToClasses(Provider provider, TLTransaction[] data, string accountId = null)
@@ -70,7 +70,7 @@
             _dataStore.InsertMany<Transaction>(data);
 
             // Update the accounts with the new fetch time
-            var account = _dataStore.FindOne<Account>(x => x.AccountId == accountId);
+            var account = _dataStore.FindOne<Card>(x => x.AccountId == accountId);
             account.LastTransactionUpdate = DateTime.UtcNow;
             _dataStore.Update(account.Id, account);
         }

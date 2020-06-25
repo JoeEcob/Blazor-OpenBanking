@@ -1,7 +1,8 @@
 ﻿@page "/dashboard"
 
-@inject DatabaseService DatabaseService
-@inject BankingUpdateService BankingUpdateService
+@inject AuthService _authService
+@inject AccountLoader _accountLoader
+@inject TransactionLoader _transactionLoader
 
 <div class="dashboard">
     @if (isLoading)
@@ -11,7 +12,7 @@
     else
     {
         <div class="add-new">
-            <a href=@BankingUpdateService.GetAuthUrl()>Add new account</a>
+            <a href=@_authService.GetAuthUrl()>Add new account</a>
         </div>
 
         <div class="flex-grid">
@@ -20,7 +21,8 @@
                 <h2>Accounts</h2>
                 @foreach (var account in accounts)
                 {
-                    <div class="account clickable" @onclick="@(e => FetchTransactions(account.ProviderId, account.AccountId, account.LastTransactionUpdate))">
+                    var selected = account.AccountId == selectedAccountId ? "selected" : "";
+                    <div class="account clickable @selected" @onclick="@(e => FetchTransactions(account.ProviderId, account.AccountId))">
                         <div class="text-wrapper">
                             <div class="title">@account.DisplayName<span class="value">@account.CurrentBalance.ToString("C")</span></div>
                             <div><em>Available</em><span class="value">@account.AvailableBalance.ToString("C")</span></div>
@@ -38,7 +40,7 @@
             </section>
 
             <section class="dashboard-transactions">
-                @if (transactions != null && transactions.Length > 0)
+                @if (transactions?.Length > 0)
                 {
                     <h2>Transactions</h2>
                     int previousMonth = -1;
@@ -64,38 +66,24 @@
 
 @code {
     private bool isLoading = true;
+    private string selectedAccountId;
     private Account[] accounts;
     private Transaction[] transactions;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = false;
-        accounts = DatabaseService.GetAccounts();
-        transactions = new Transaction[0];
 
-        if (accounts == null || accounts.Length == 0 || accounts.Any(x => x.LastUpdated < DateTime.UtcNow.AddDays(-1)))
-        {
-            await BankingUpdateService.FetchLatestAccountInfo();
-            accounts = DatabaseService.GetAccounts();
-        }
+        // TODO - stop this getting hit twice on pre-render
+        accounts = await _accountLoader.Load();
 
-        if (accounts.Length > 0)
-        {
-            var firstAccount = accounts[0];
-            await FetchTransactions(firstAccount.ProviderId, firstAccount.AccountId, firstAccount.LastTransactionUpdate);
-        }
+        var firstAccount = accounts.First();
+        transactions = await _transactionLoader.Load(firstAccount.ProviderId, firstAccount.AccountId);
     }
 
-    private async Task FetchTransactions(LiteDB.ObjectId providerId, string accountId, DateTime lastTransactionUpdate)
+    private async Task FetchTransactions(LiteDB.ObjectId providerId, string accountId)
     {
-        transactions = DatabaseService.GetTransactions(accountId);
-
-        if (transactions == null || transactions.Length == 0 || lastTransactionUpdate < DateTime.UtcNow.AddDays(-1))
-        {
-            await BankingUpdateService.UpdateTransactions(providerId, accountId);
-            transactions = DatabaseService.GetTransactions(accountId);
-            // Need to update accounts now to get the latest transaction update time
-            accounts = DatabaseService.GetAccounts();
-        }
+        selectedAccountId = accountId;
+        transactions = await _transactionLoader.Load(providerId, accountId);
     }
 }

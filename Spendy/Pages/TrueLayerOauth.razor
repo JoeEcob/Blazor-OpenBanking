@@ -1,7 +1,7 @@
 ﻿@page "/truelayer/oauth"
 
-@inject NavigationManager NavigationManager
-@inject BankingUpdateService BankingUpdateService
+@inject NavigationManager _navigationManager
+@inject AuthService _authService
 @using Microsoft.AspNetCore.WebUtilities
 
 <h3>TrueLayer Oauth Callback</h3>
@@ -12,14 +12,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri);
 
         var query = QueryHelpers.ParseQuery(uri.Query);
         if (query.TryGetValue("code", out var code))
         {
-            await BankingUpdateService.GenerateAccessTokenAsync(code);
+            await _authService.GenerateAccessTokenAsync(code);
 
-            NavigationManager.NavigateTo("/dashboard");
+            _navigationManager.NavigateTo("/dashboard");
         }
     }
 }

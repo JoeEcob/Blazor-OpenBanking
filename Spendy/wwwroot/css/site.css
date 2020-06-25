@@ -117,13 +117,17 @@ header nav a:hover {
     display: flex;
 }
 .dashboard-accounts {
-    flex: 1 1 30%;
+    flex: 1 1 25%;
     padding-right: 1rem;
 }
 .dashboard-accounts .account {
     padding: .5rem;
     display: flex;
     font-size: .8rem;
+    margin-bottom: .5rem;
+}
+.dashboard-accounts .account.selected {
+    border-right: 2px solid var(--color-blue-primary);
 }
 .dashboard-accounts .account:hover {
     background-color: #eee;
@@ -144,7 +148,7 @@ header nav a:hover {
     flex: 1 1 20%;
 }
 .dashboard-transactions {
-    flex: 1 1 70%;
+    flex: 1 1 75%;
 }
 .dashboard-transactions h2 {
     margin: 0 0 .9rem;
@@ -160,7 +164,11 @@ header nav a:hover {
     margin: 1rem 0 0;
 }
 .dashboard-transactions .transaction .date {
-    padding-right: 1rem;
+    padding-right: .5rem;
+    display: inline-block;
+    font-size: .8rem;
+    font-weight: lighter;
+    width: 65px;
 }
 .dashboard-transactions .transaction .amount {
     float: right;

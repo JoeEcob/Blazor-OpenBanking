@@ -6,6 +6,7 @@ namespace Spendy
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Spendy.Data;
+    using Spendy.Data.Loaders;
     using TrueLayer.API;
 
     public class Startup
@@ -25,8 +26,9 @@ namespace Spendy
             services.AddServerSideBlazor();
             services.AddHttpClient();
             services.AddSingleton<LiteDBDatastore>();
-            services.AddSingleton<DatabaseService>();
-            services.AddSingleton<BankingUpdateService>();
+            services.AddSingleton<AuthService>();
+            services.AddSingleton<AccountLoader>();
+            services.AddSingleton<TransactionLoader>();
             services.AddSingleton<TrueLayerAuth>();
             services.AddSingleton<TrueLayerAPI>();
         }

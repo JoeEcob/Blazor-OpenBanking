@@ -1,6 +1,7 @@
 ﻿namespace TrueLayer.API
 {
     using Microsoft.Extensions.Configuration;
+    using System.Collections.Generic;
     using System.Net.Http;
     using System.Text.Json;
     using System.Threading.Tasks;
@@ -10,10 +11,10 @@
     {
         private readonly HttpClient _authClient;
         private readonly string AuthURL;
-        private static readonly string RedirectURL = "https://localhost:44353/truelayer/oauth";
-        private static readonly bool EnableMock = true;
         private readonly string ClientId;
         private readonly string ClientSecret;
+        private readonly bool EnableMock;
+        private readonly string RedirectURL;
 
         public TrueLayerAuth(IConfiguration config, IHttpClientFactory httpClientFactory)
         {
@@ -21,6 +22,8 @@
             AuthURL = config["TrueLayer:AuthUrl"];
             ClientId = config["TrueLayer:ClientId"];
             ClientSecret = config["TrueLayer:ClientSecret"];
+            EnableMock = config.GetValue<bool>("TrueLayer:EnableMock");
+            RedirectURL = config["TrueLayer:RedirectURL"];
         }
 
         public string GetAuthUrl()
@@ -32,14 +35,14 @@
 
         public async Task<TLAccessToken> GetAccessTokenAsync(string code)
         {
-            var content = new MultipartFormDataContent
+            using var content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                { new StringContent("authorization_code"), "grant_type" },
-                { new StringContent(ClientId), "client_id" },
-                { new StringContent(ClientSecret), "client_secret" },
-                { new StringContent(code), "code" },
-                { new StringContent(RedirectURL), "redirect_uri" }
-            };
+                { "grant_type", "authorization_code" },
+                { "client_id", ClientId },
+                { "client_secret", ClientSecret },
+                { "code", code },
+                { "redirect_uri", RedirectURL }
+            });
 
             var response = await _authClient.PostAsync($"{AuthURL}/connect/token", content);
 
@@ -48,13 +51,13 @@
 
         public async Task<TLAccessToken> RefreshTokenAsync(string refreshToken)
         {
-            var content = new MultipartFormDataContent
+            using var content = new FormUrlEncodedContent(new Dictionary<string, string>
             {
-                { new StringContent("refresh_token"), "grant_type" },
-                { new StringContent(ClientId), "client_id" },
-                { new StringContent(ClientSecret), "client_secret" },
-                { new StringContent(refreshToken), "refresh_token" },
-            };
+                { "grant_type", "refresh_token" },
+                { "client_id", ClientId },
+                { "client_secret", ClientSecret },
+                { "refresh_token", refreshToken },
+            });
 
             var response = await _authClient.PostAsync($"{AuthURL}/connect/token", content);
 
@@ -71,7 +74,8 @@
             else
             {
                 // TODO - log error
-                return default;
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                throw new System.Exception(errorMessage);
             }
         }
     }

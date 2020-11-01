@@ -99,8 +99,11 @@
         accounts = await _accountLoader.Load();
         creditCards = await _creditCardLoader.Load();
 
-        var firstAccount = accounts.First();
-        await FetchTransactions(firstAccount.ProviderId, firstAccount.AccountId);
+        if (accounts.Any())
+        {
+            var firstAccount = accounts.First();
+            await FetchTransactions(firstAccount.ProviderId, firstAccount.AccountId);
+        }
     }
 
     private async Task FetchTransactions(LiteDB.ObjectId providerId, string accountId)

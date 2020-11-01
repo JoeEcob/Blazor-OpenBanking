@@ -30,7 +30,7 @@
             var provider = _dataStore.FindOne<Provider>(x => x.Id == providerId);
 
             var lastUpdate = GetLastUpdateTime(provider, accountId);
-            if (lastUpdate > DateTime.UtcNow.AddDays(-1))
+            if (lastUpdate > DateTime.UtcNow.AddHours(-6))
             {
                 return FetchDatabaseData(provider, accountId);
             }

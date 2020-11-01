@@ -34,6 +34,7 @@
 
         private async Task<Provider> SaveAccessToken(TLAccessToken accessToken)
         {
+            // TODO - handle access token failures
             var newProvider = new Provider
             {
                 Name = await _trueLayerApi.GetProviderName(accessToken.Token),

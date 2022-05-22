@@ -367,3 +367,4 @@ MigrationBackup/
 .DS_Store
 
 AppData/
+!AppData/.gitkeep

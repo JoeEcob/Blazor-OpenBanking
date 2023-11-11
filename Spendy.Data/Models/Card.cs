@@ -8,7 +8,7 @@
         [BsonId]
         public ObjectId Id { get; set; }
 
-        public ObjectId ProviderId { get; set; }
+        public ObjectId AuthId { get; set; }
 
         public string AccountId { get; set; } // ID from TrueLayer
 

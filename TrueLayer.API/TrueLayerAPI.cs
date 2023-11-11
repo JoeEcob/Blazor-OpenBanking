@@ -19,7 +19,7 @@
             ApiURL = config["TrueLayer:ApiUrl"];
         }
 
-        public async Task<string> GetProviderName(string accessToken)
+        public async Task<TLAccessTokenMetadata> GetTokenMetadata(string accessToken)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{ApiURL}/data/v1/me");
             request.Headers.Add("Authorization", $"Bearer {accessToken}");
@@ -28,9 +28,7 @@
 
             var tokenInfo = await HandleResponse<TLAccessTokenMetadata>(response);
 
-            tokenInfo.Results.Single().Provider.TryGetValue("provider_id", out var providerName);
-
-            return providerName;
+            return tokenInfo.Results.Single();
         }
 
         public async Task<TLApiResponse<TLAccount>> GetAccounts(string accessToken)
@@ -101,7 +99,7 @@
             {
                 using var responseStream = await response.Content.ReadAsStreamAsync();
                 var apiResponse = await JsonSerializer.DeserializeAsync<TLApiResponse<T>>(responseStream);
-                return apiResponse;
+                return apiResponse; // TODO - Log this (redact secrets?)
             }
             else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {

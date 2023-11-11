@@ -1,16 +1,19 @@
-﻿using LiteDB;
-using System;
-
-namespace Spendy.Data.Models
+﻿namespace Spendy.Data.Models
 {
+    using LiteDB;
+    using System;
+
     public class Account
     {
         [BsonId]
         public ObjectId Id { get; set; }
 
-        public ObjectId ProviderId { get; set; }
+        public ObjectId AuthId { get; set; }
 
-        public string AccountId { get; set; } // ID from TrueLayer
+        // ID from TrueLayer
+        public string AccountId { get; set; }
+
+        public string ProviderName { get; set; }
 
         public string DisplayName { get; set; }
 
@@ -25,6 +28,5 @@ namespace Spendy.Data.Models
         public DateTime LastUpdated { get; set; }
 
         public DateTime LastTransactionUpdate { get; set; }
-
     }
 }

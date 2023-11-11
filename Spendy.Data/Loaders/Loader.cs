@@ -25,9 +25,9 @@
             _dataStore = dataStore;
         }
 
-        public async Task<T2[]> Load(ObjectId providerId, string accountId = null)
+        public async Task<T2[]> Load(ObjectId authId, string accountId = null)
         {
-            var provider = _dataStore.FindOne<Provider>(x => x.Id == providerId);
+            var provider = _dataStore.FindOne<Auth>(x => x.Id == authId);
 
             var lastUpdate = GetLastUpdateTime(provider, accountId);
             if (lastUpdate > DateTime.UtcNow.AddHours(-6))
@@ -52,14 +52,14 @@
         }
 
         // TODO - clean up optional parameters
-        protected abstract DateTime GetLastUpdateTime(Provider provider, string accountId = null);
+        protected abstract DateTime GetLastUpdateTime(Auth auth, string accountId = null);
 
-        protected abstract T2[] FetchDatabaseData(Provider provider, string accountId = null);
+        protected abstract T2[] FetchDatabaseData(Auth auth, string accountId = null);
 
-        protected abstract Task<TLApiResponse<T1>> FetchApiData(Provider provider, string accountId = null);
+        protected abstract Task<TLApiResponse<T1>> FetchApiData(Auth auth, string accountId = null);
 
-        protected abstract T2[] MapToClasses(Provider provider, T1[] data, string accountId = null);
+        protected abstract T2[] MapToClasses(Auth auth, T1[] data, string accountId = null);
 
-        protected abstract void SaveToDatabase(Provider provider, T2[] data, string accountId = null);
+        protected abstract void SaveToDatabase(Auth auth, T2[] data, string accountId = null);
     }
 }

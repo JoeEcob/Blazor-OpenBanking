@@ -2,12 +2,14 @@
 {
     using LiteDB;
 
-    public class Provider
+    public class Auth
     {
         [BsonId]
         public ObjectId Id { get; set; }
 
-        public string Name { get; set; }
+        public string ProviderId { get; set; }
+
+        public string ProviderDisplayName { get; set; }
 
         public string AccessToken { get; set; }
 

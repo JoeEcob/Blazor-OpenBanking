@@ -24,9 +24,9 @@
                 @foreach (var account in accounts)
                 {
                     var selected = account.AccountId == selectedAccountId ? "selected" : "";
-                    <div class="account clickable @selected" @onclick="@(e => FetchTransactions(account.ProviderId, account.AccountId))">
+                    <div class="account clickable @selected" @onclick="@(e => FetchTransactions(account.AuthId, account.AccountId))">
                         <div class="text-wrapper">
-                            <div class="title">@account.DisplayName<span class="value">@account.CurrentBalance.ToString("C")</span></div>
+                            <div class="title">@account.ProviderName - @account.DisplayName<span class="value">@account.CurrentBalance.ToString("C")</span></div>
                             <div><em>Available</em><span class="value">@account.AvailableBalance.ToString("C")</span></div>
                             <div><em>Overdraft</em><span class="value">@account.Overdraft.ToString("C")</span></div>
                         </div>
@@ -43,7 +43,7 @@
                 @foreach (var card in creditCards)
                 {
                     var selected = card.AccountId == selectedAccountId ? "selected" : "";
-                    <div class="account clickable @selected" @onclick="@(e => FetchCardTransactions(card.ProviderId, card.AccountId))">
+                    <div class="account clickable @selected" @onclick="@(e => FetchCardTransactions(card.AuthId, card.AccountId))">
                         <div class="text-wrapper">
                             <div class="title">@card.DisplayName<span class="value">@card.CurrentBalance.ToString("C")</span></div>
                             <div><em>Available</em><span class="value">@card.AvailableBalance.ToString("C")</span></div>
@@ -102,19 +102,19 @@
         if (accounts.Any())
         {
             var firstAccount = accounts.First();
-            await FetchTransactions(firstAccount.ProviderId, firstAccount.AccountId);
+            await FetchTransactions(firstAccount.AuthId, firstAccount.AccountId);
         }
     }
 
-    private async Task FetchTransactions(LiteDB.ObjectId providerId, string accountId)
+    private async Task FetchTransactions(LiteDB.ObjectId authId, string accountId)
     {
         selectedAccountId = accountId;
-        transactions = await _transactionLoader.Load(providerId, accountId);
+        transactions = await _transactionLoader.Load(authId, accountId);
     }
 
-    private async Task FetchCardTransactions(LiteDB.ObjectId providerId, string accountId)
+    private async Task FetchCardTransactions(LiteDB.ObjectId authId, string accountId)
     {
         selectedAccountId = accountId;
-        transactions = await _creditCardTransactionLoader.Load(providerId, accountId);
+        transactions = await _creditCardTransactionLoader.Load(authId, accountId);
     }
 }

@@ -1,10 +1,9 @@
 ﻿namespace TrueLayer.API.Models
 {
     using System;
-    using System.Collections.Generic;
     using System.Text.Json.Serialization;
 
-    internal class TLAccessTokenMetadata
+    public class TLAccessTokenMetadata
     {
         [JsonPropertyName("consent_status")]
         public string ConsentStatus { get; set; }
@@ -13,6 +12,6 @@
         public DateTime ConsentExpiresAt { get; set; }
 
         [JsonPropertyName("provider")]
-        public Dictionary<string, string> Provider { get; set; }
+        public TLProvider Provider { get; set; }
     }
 }

@@ -19,7 +19,7 @@
         {
             var accounts = new List<Account>();
 
-            var providers = _dataStore.FindAll<Provider>();
+            var providers = _dataStore.FindAll<Auth>();
             foreach (var provider in providers)
             {
                 accounts.AddRange(await Load(provider.Id));
@@ -28,33 +28,33 @@
             return accounts.ToArray();
         }
 
-        protected override DateTime GetLastUpdateTime(Provider provider, string accountId = null)
+        protected override DateTime GetLastUpdateTime(Auth auth, string accountId = null)
         {
-            var allAccounts = _dataStore.Find<Account>(x => x.ProviderId == provider.Id);
+            var allAccounts = _dataStore.Find<Account>(x => x.AuthId == auth.Id);
             return allAccounts?.Length > 0 ? allAccounts.Min(x => x.LastUpdated) : DateTime.MinValue;
         }
 
-        protected override async Task<TLApiResponse<TLAccount>> FetchApiData(Provider provider, string accountId = null)
+        protected override async Task<TLApiResponse<TLAccount>> FetchApiData(Auth auth, string accountId = null)
         {
-            var accounts = await _trueLayerApi.GetAccounts(provider.AccessToken);
+            var accounts = await _trueLayerApi.GetAccounts(auth.AccessToken);
 
             if (accounts?.Results?.Length > 0)
             {
                 foreach (var account in accounts.Results)
                 {
-                    account.Balance = (await _trueLayerApi.GetBalance(provider.AccessToken, account.AccountId)).Results.First();
+                    account.Balance = (await _trueLayerApi.GetBalance(auth.AccessToken, account.AccountId)).Results.First();
                 }
             }
 
             return accounts;
         }
 
-        protected override Account[] FetchDatabaseData(Provider provider, string accountId = null)
+        protected override Account[] FetchDatabaseData(Auth auth, string accountId = null)
         {
-            return _dataStore.Find<Account>(x => x.ProviderId == provider.Id);
+            return _dataStore.Find<Account>(x => x.AuthId == auth.Id);
         }
 
-        protected override Account[] MapToClasses(Provider provider, TLAccount[] data, string accountId = null)
+        protected override Account[] MapToClasses(Auth auth, TLAccount[] data, string accountId = null)
         {
             var newAccounts = new List<Account>();
 
@@ -62,8 +62,9 @@
             {
                 newAccounts.Add(new Account
                 {
-                    ProviderId = provider.Id,
+                    AuthId = auth.Id,
                     AccountId = account.AccountId,
+                    ProviderName = auth.ProviderDisplayName,
                     DisplayName = account.DisplayName,
                     LogoUri = account.Provider.LogoUri,
                     AvailableBalance = account.Balance.Available,
@@ -76,9 +77,9 @@
             return newAccounts.ToArray();
         }
 
-        protected override void SaveToDatabase(Provider provider, Account[] newAccounts, string accountId = null)
+        protected override void SaveToDatabase(Auth auth, Account[] newAccounts, string accountId = null)
         {
-            _dataStore.DeleteMany<Account>(x => x.ProviderId == provider.Id);
+            _dataStore.DeleteMany<Account>(x => x.AuthId == auth.Id);
             _dataStore.InsertMany<Account>(newAccounts.ToArray());
         }
     }

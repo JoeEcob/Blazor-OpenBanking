@@ -26,23 +26,26 @@
             await SaveAccessToken(accessToken);
         }
 
-        public async Task<Provider> RefreshAccessToken(Provider provider)
+        public async Task<Auth> RefreshAccessToken(Auth auth)
         {
-            var accessToken = await _trueLayerAuth.RefreshTokenAsync(provider.RefreshToken);
+            var accessToken = await _trueLayerAuth.RefreshTokenAsync(auth.RefreshToken);
             return await SaveAccessToken(accessToken);
         }
 
-        private async Task<Provider> SaveAccessToken(TLAccessToken accessToken)
+        private async Task<Auth> SaveAccessToken(TLAccessToken accessToken)
         {
             // TODO - handle access token failures
-            var newProvider = new Provider
+            var tokenInfo = await _trueLayerApi.GetTokenMetadata(accessToken.Token);
+
+            var newProvider = new Auth
             {
-                Name = await _trueLayerApi.GetProviderName(accessToken.Token),
+                ProviderId = tokenInfo.Provider.ProviderId,
+                ProviderDisplayName = tokenInfo.Provider.DisplayName,
                 AccessToken = accessToken.Token,
                 RefreshToken = accessToken.RefreshToken
             };
 
-            var existingRecord = _dataStore.FindOne<Provider>(x => x.Name == newProvider.Name);
+            var existingRecord = _dataStore.FindOne<Auth>(x => x.ProviderId == newProvider.ProviderId);
             if (existingRecord != null)
             {
                 newProvider.Id = existingRecord.Id;

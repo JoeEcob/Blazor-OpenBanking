@@ -19,7 +19,7 @@
         {
             var creditCards = new List<Card>();
 
-            var providers = _dataStore.FindAll<Provider>();
+            var providers = _dataStore.FindAll<Auth>();
             foreach (var provider in providers)
             {
                 creditCards.AddRange(await Load(provider.Id));
@@ -28,33 +28,33 @@
             return creditCards.ToArray();
         }
 
-        protected override DateTime GetLastUpdateTime(Provider provider, string accountId = null)
+        protected override DateTime GetLastUpdateTime(Auth auth, string accountId = null)
         {
-            var allCards = _dataStore.Find<Card>(x => x.ProviderId == provider.Id);
+            var allCards = _dataStore.Find<Card>(x => x.AuthId == auth.Id);
             return allCards?.Length > 0 ? allCards.Min(x => x.LastUpdated) : DateTime.MinValue;
         }
 
-        protected override async Task<TLApiResponse<TLCard>> FetchApiData(Provider provider, string accountId = null)
+        protected override async Task<TLApiResponse<TLCard>> FetchApiData(Auth auth, string accountId = null)
         {
-            var cards = await _trueLayerApi.GetCards(provider.AccessToken);
+            var cards = await _trueLayerApi.GetCards(auth.AccessToken);
 
             if (cards?.Results?.Length > 0)
             {
                 foreach (var card in cards.Results)
                 {
-                    card.Balance = (await _trueLayerApi.GetCardBalance(provider.AccessToken, card.AccountId)).Results.First();
+                    card.Balance = (await _trueLayerApi.GetCardBalance(auth.AccessToken, card.AccountId)).Results.First();
                 }
             }
 
             return cards;
         }
 
-        protected override Card[] FetchDatabaseData(Provider provider, string accountId = null)
+        protected override Card[] FetchDatabaseData(Auth auth, string accountId = null)
         {
-            return _dataStore.Find<Card>(x => x.ProviderId == provider.Id);
+            return _dataStore.Find<Card>(x => x.AuthId == auth.Id);
         }
 
-        protected override Card[] MapToClasses(Provider provider, TLCard[] data, string accountId = null)
+        protected override Card[] MapToClasses(Auth auth, TLCard[] data, string accountId = null)
         {
             var newCards = new List<Card>();
 
@@ -62,7 +62,7 @@
             {
                 newCards.Add(new Card
                 {
-                    ProviderId = provider.Id,
+                    AuthId = auth.Id,
                     AccountId = card.AccountId,
                     DisplayName = card.DisplayName,
                     LogoUri = card.Provider.LogoUri,
@@ -80,9 +80,9 @@
             return newCards.ToArray();
         }
 
-        protected override void SaveToDatabase(Provider provider, Card[] newCards, string accountId = null)
+        protected override void SaveToDatabase(Auth auth, Card[] newCards, string accountId = null)
         {
-            _dataStore.DeleteMany<Card>(x => x.ProviderId == provider.Id);
+            _dataStore.DeleteMany<Card>(x => x.AuthId == auth.Id);
             _dataStore.InsertMany<Card>(newCards.ToArray());
         }
     }

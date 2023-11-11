@@ -40,7 +40,6 @@
             var newProvider = new Auth
             {
                 ProviderId = tokenInfo.Provider.ProviderId,
-                ProviderDisplayName = tokenInfo.Provider.DisplayName,
                 AccessToken = accessToken.Token,
                 RefreshToken = accessToken.RefreshToken
             };

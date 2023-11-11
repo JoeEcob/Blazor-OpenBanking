@@ -13,11 +13,7 @@
         // ID from TrueLayer
         public string AccountId { get; set; }
 
-        public string ProviderName { get; set; }
-
         public string DisplayName { get; set; }
-
-        public string LogoUri { get; set; }
 
         public decimal AvailableBalance { get; set; }
 
@@ -28,5 +24,8 @@
         public DateTime LastUpdated { get; set; }
 
         public DateTime LastTransactionUpdate { get; set; }
+
+        [BsonIgnore]
+        public Provider Provider { get; set; }
     }
 }

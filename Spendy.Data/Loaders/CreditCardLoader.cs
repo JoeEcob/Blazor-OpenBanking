@@ -10,19 +10,31 @@
 
     public class CreditCardLoader : Loader<TLCard, Card>
     {
-        public CreditCardLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore)
+        private readonly ProviderService _providerService;
+
+        public CreditCardLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore, ProviderService providerService)
             : base(authService, trueLayerApi, dataStore)
         {
+            _providerService = providerService;
         }
 
         public async Task<Card[]> Load()
         {
             var creditCards = new List<Card>();
 
-            var providers = _dataStore.FindAll<Auth>();
-            foreach (var provider in providers)
+            var auths = _dataStore.FindAll<Auth>();
+            foreach (var auth in auths)
             {
-                creditCards.AddRange(await Load(provider.Id));
+                var loadedCards = await Load(auth.Id);
+
+                // Inject provider metadata
+                var providerInfo = await _providerService.GetProvider(auth.ProviderId);
+                foreach (var card in loadedCards)
+                {
+                    card.Provider = providerInfo;
+                }
+
+                creditCards.AddRange(loadedCards);
             }
 
             return creditCards.ToArray();
@@ -65,7 +77,6 @@
                     AuthId = auth.Id,
                     AccountId = card.AccountId,
                     DisplayName = card.DisplayName,
-                    LogoUri = card.Provider.LogoUri,
                     AvailableBalance = card.Balance.Available,
                     CurrentBalance = card.Balance.Current,
                     CreditLimit = card.Balance.CreditLimit,

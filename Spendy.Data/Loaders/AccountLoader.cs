@@ -10,19 +10,31 @@
 
     public class AccountLoader : Loader<TLAccount, Account>
     {
-        public AccountLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore)
+        private readonly ProviderService _providerService;
+
+        public AccountLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore, ProviderService providerService)
             : base(authService, trueLayerApi, dataStore)
         {
+            _providerService = providerService;
         }
 
         public async Task<Account[]> Load()
         {
             var accounts = new List<Account>();
 
-            var providers = _dataStore.FindAll<Auth>();
-            foreach (var provider in providers)
+            var auths = _dataStore.FindAll<Auth>();
+            foreach (var auth in auths)
             {
-                accounts.AddRange(await Load(provider.Id));
+                var loadedAccs = await Load(auth.Id);
+
+                // Inject provider metadata
+                var providerInfo = await _providerService.GetProvider(auth.ProviderId);
+                foreach (var acc in loadedAccs)
+                {
+                    acc.Provider = providerInfo;
+                }
+
+                accounts.AddRange(loadedAccs);
             }
 
             return accounts.ToArray();
@@ -64,9 +76,7 @@
                 {
                     AuthId = auth.Id,
                     AccountId = account.AccountId,
-                    ProviderName = auth.ProviderDisplayName,
                     DisplayName = account.DisplayName,
-                    LogoUri = account.Provider.LogoUri,
                     AvailableBalance = account.Balance.Available,
                     CurrentBalance = account.Balance.Current,
                     Overdraft = account.Balance.Overdraft,

@@ -21,6 +21,7 @@ builder.Services.AddSingleton<TransactionLoader>();
 builder.Services.AddSingleton<CreditCardTransactionLoader>();
 builder.Services.AddSingleton<TrueLayerAuth>();
 builder.Services.AddSingleton<TrueLayerAPI>();
+builder.Services.AddSingleton<ProviderService>();
 
 var app = builder.Build();
 

@@ -26,15 +26,15 @@
                     var selected = account.AccountId == selectedAccountId ? "selected" : "";
                     <div class="account clickable @selected" @onclick="@(e => FetchTransactions(account.AuthId, account.AccountId))">
                         <div class="text-wrapper">
-                            <div class="title">@account.ProviderName - @account.DisplayName<span class="value">@account.CurrentBalance.ToString("C")</span></div>
+                            <div class="title">@account.DisplayName<span class="value">@account.CurrentBalance.ToString("C")</span></div>
                             <div><em>Available</em><span class="value">@account.AvailableBalance.ToString("C")</span></div>
                             <div><em>Overdraft</em><span class="value">@account.Overdraft.ToString("C")</span></div>
                         </div>
 
-                        @if (account.LogoUri != null)
+                        @if (account.Provider.LogoUrl != null)
                         {
                             <span class="account-logo">
-                                <img src="@account.LogoUri" />
+                                <img src="@account.Provider.LogoUrl" />
                             </span>
                         }
                     </div>
@@ -49,10 +49,10 @@
                             <div><em>Available</em><span class="value">@card.AvailableBalance.ToString("C")</span></div>
                         </div>
 
-                        @if (card.LogoUri != null)
+                        @if (card.Provider.LogoUrl != null)
                         {
                             <span class="account-logo">
-                                <img src="@card.LogoUri" />
+                                <img src="@card.Provider.LogoUrl" />
                             </span>
                         }
                     </div>

@@ -46,7 +46,7 @@
 
             var response = await _authClient.PostAsync($"{AuthURL}/connect/token", content);
 
-            return await HandleResponse(response);
+            return await HandleResponse<TLAccessToken>(response);
         }
 
         public async Task<TLAccessToken> RefreshTokenAsync(string refreshToken)
@@ -61,15 +61,22 @@
 
             var response = await _authClient.PostAsync($"{AuthURL}/connect/token", content);
 
-            return await HandleResponse(response);
+            return await HandleResponse<TLAccessToken>(response);
         }
 
-        private async Task<TLAccessToken> HandleResponse(HttpResponseMessage response)
+        public async Task<TLProvider[]> GetProviders()
+        {
+            var response = await _authClient.GetAsync($"{AuthURL}/api/providers");
+
+            return await HandleResponse<TLProvider[]>(response);
+        }
+
+        private async Task<T> HandleResponse<T>(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode)
             {
                 using var responseStream = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<TLAccessToken>(responseStream);
+                return await JsonSerializer.DeserializeAsync<T>(responseStream);
             }
             else
             {

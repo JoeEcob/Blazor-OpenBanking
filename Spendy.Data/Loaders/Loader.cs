@@ -29,12 +29,14 @@
         {
             var provider = _dataStore.FindOne<Auth>(x => x.Id == authId);
 
+            // Return DB data if we don't need to update.
             var lastUpdate = GetLastUpdateTime(provider, accountId);
             if (lastUpdate > DateTime.UtcNow.AddHours(-6))
             {
                 return FetchDatabaseData(provider, accountId);
             }
 
+            // Else go off and fetch the latest data from the API.
             TLApiResponse<T1> response = await FetchApiData(provider, accountId);
 
             if (response.ShouldAttemptRefresh)

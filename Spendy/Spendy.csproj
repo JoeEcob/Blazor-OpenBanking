@@ -10,4 +10,7 @@
   <ItemGroup>
     <Folder Include="AppData\" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Blazor-ApexCharts" Version="6.1.0" />
+  </ItemGroup>
 </Project>

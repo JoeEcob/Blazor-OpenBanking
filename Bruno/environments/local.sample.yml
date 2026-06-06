@@ -1,0 +1,20 @@
+name: local
+
+variables:
+  - name: baseUrl
+    value: https://api.truelayer.com/data/v1
+
+  - name: accountId
+    value: ""
+
+  - name: clientId
+    value: ""
+
+  - name: clientSecret
+    value: ""
+
+  - name: accessToken
+    value: ""
+
+  - name: refreshToken
+    value: ""

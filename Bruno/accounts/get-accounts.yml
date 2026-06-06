@@ -1,0 +1,28 @@
+info:
+  name: Get Accounts
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseUrl}}/accounts"
+
+  headers:
+    - name: Authorization
+      value: "Bearer {{accessToken}}"
+
+    - name: Accept
+      value: application/json
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |
+        const body = res.getBody();
+
+        if (body.results?.length) {
+          bru.setEnvVar(
+            "accountId",
+            body.results[0].account_id
+          );
+        }

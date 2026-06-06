@@ -8,6 +8,7 @@ Blazor web app to pull Open Banking data
 $ dotnet watch
 ```
 
+Transactions will be fetched every 6 hours (set in `Loader.cs`).
 
 ## User Secrets
 

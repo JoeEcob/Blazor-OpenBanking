@@ -1,15 +1,12 @@
 ﻿@inherits LayoutComponentBase
 
 <header>
-    <NavLink href="">
-        <h1>Spendy</h1>
-    </NavLink>
-    <nav>
-        <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
-        <NavLink href="/dashboard" Match="NavLinkMatch.All">Dashboard</NavLink>
-    </nav>
+  <NavLink href="/">
+    <h1>Spendy</h1>
+  </NavLink>
+  <nav>
+    <NavLink href="/" Match="NavLinkMatch.All">Dashboard</NavLink>
+  </nav>
 </header>
 
-<div class="main">
-    @Body
-</div>
+<div class="main">@Body</div>

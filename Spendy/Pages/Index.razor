@@ -1,25 +1,120 @@
 ﻿@page "/"
 
+@inject AuthService _authService
+@inject AccountLoader _accountLoader
+@inject CreditCardLoader _creditCardLoader
+@inject TransactionLoader _transactionLoader
+@inject CreditCardTransactionLoader _creditCardTransactionLoader
 
-<div class="year-progress">
-    <h2>Year Progress</h2>
-    <div class="graph-container">
-        @{ var styleAttr = $"width: {yearProgress};"; }
-        <div class="percentage" style=@styleAttr></div>
-    </div>
-    <span class="label">@yearProgress</span>
+<div class="dashboard">
+    @if (isLoading)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="add-new">
+            <a href=@_authService.GetAuthUrl()>Add new account</a>
+        </div>
+
+        <div class="flex-grid">
+            <section class="dashboard-accounts">
+
+                <h2>Accounts</h2>
+                @foreach (var account in accounts)
+                {
+                    var selected = account.AccountId == selectedAccountId ? "selected" : "";
+                    <div class="account clickable @selected" @onclick="@(e => FetchTransactions(account.AuthId, account.AccountId))">
+                        <div class="text-wrapper">
+                            <div class="title">@account.DisplayName<span class="value">@account.CurrentBalance.ToString("C")</span></div>
+                            <div><em>Available</em><span class="value">@account.AvailableBalance.ToString("C")</span></div>
+                            <div><em>Overdraft</em><span class="value">@account.Overdraft.ToString("C")</span></div>
+                        </div>
+
+                        @if (account.Provider.LogoUrl != null)
+                        {
+                            <span class="account-logo">
+                                <img src="@account.Provider.LogoUrl" />
+                            </span>
+                        }
+                    </div>
+                }
+
+                @foreach (var card in creditCards)
+                {
+                    var selected = card.AccountId == selectedAccountId ? "selected" : "";
+                    <div class="account clickable @selected" @onclick="@(e => FetchCardTransactions(card.AuthId, card.AccountId))">
+                        <div class="text-wrapper">
+                            <div class="title">@card.DisplayName<span class="value">@card.CurrentBalance.ToString("C")</span></div>
+                            <div><em>Available</em><span class="value">@card.AvailableBalance.ToString("C")</span></div>
+                        </div>
+
+                        @if (card.Provider.LogoUrl != null)
+                        {
+                            <span class="account-logo">
+                                <img src="@card.Provider.LogoUrl" />
+                            </span>
+                        }
+                    </div>
+                }
+            </section>
+
+            <section class="dashboard-transactions">
+                @if (transactions?.Length > 0)
+                {
+                    <h2>Transactions</h2>
+                    int previousMonth = -1;
+                    @foreach (var transaction in transactions)
+                    {
+                        if (transaction.Timestamp.Month != previousMonth)
+                        {
+                            previousMonth = transaction.Timestamp.Month;
+                            <h3 class="transaction-title">@transaction.Timestamp.ToString("MMMM \\'yy")</h3>
+                        }
+
+                        <div class="transaction">
+                            <span class="date" title="@transaction.Timestamp.ToString("G")">@transaction.Timestamp.ToString("d")</span>
+                            <span class="description">@transaction.Description</span>
+                            <span class="amount">@transaction.Amount.ToString("C")</span>
+                        </div>
+                    }
+                }
+            </section>
+        </div>
+    }
 </div>
 
-
 @code {
-    private string yearProgress;
+    private bool isLoading = true;
+    private string selectedAccountId;
+    private Account[] accounts = new Account[0];
+    private Card[] creditCards = new Card[0];
+    private Transaction[] transactions = new Transaction[0];
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        var now = DateTime.Now;
-        var start = new DateTime(now.Year, 1, 1);
-        var numberOfDays = (now - start).TotalDays;
+        isLoading = false;
 
-        yearProgress = $"{Math.Floor(numberOfDays / 365 * 100)}%";
+        // TODO - stop this getting hit twice on pre-render
+        accounts = await _accountLoader.Load();
+        creditCards = await _creditCardLoader.Load();
+
+        if (accounts.Any())
+        {
+            var firstAccount = accounts.First();
+            await FetchTransactions(firstAccount.AuthId, firstAccount.AccountId);
+        }
+    }
+
+    private async Task FetchTransactions(LiteDB.ObjectId authId, string accountId)
+    {
+        selectedAccountId = accountId;
+        transactions = await _transactionLoader.Load(authId, accountId);
+    }
+
+    private async Task FetchCardTransactions(LiteDB.ObjectId authId, string accountId)
+    {
+        selectedAccountId = accountId;
+        transactions = await _creditCardTransactionLoader.Load(authId, accountId);
     }
 }

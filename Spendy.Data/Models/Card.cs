@@ -15,6 +15,12 @@
 
         public string DisplayName { get; set; }
 
+        public string PartialCardNumber { get; set; }
+
+        public string CardType { get; set; }
+
+        public string CardNetwork { get; set; }
+
         public decimal AvailableBalance { get; set; }
 
         public decimal CurrentBalance { get; set; }

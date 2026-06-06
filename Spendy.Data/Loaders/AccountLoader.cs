@@ -1,5 +1,6 @@
 ﻿namespace Spendy.Data.Loaders
 {
+    using Microsoft.Extensions.Logging;
     using Spendy.Data.Models;
     using System;
     using System.Collections.Generic;
@@ -8,15 +9,10 @@
     using TrueLayer.API;
     using TrueLayer.API.Models;
 
-    public class AccountLoader : Loader<TLAccount, Account>
+    public class AccountLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore, ProviderService providerService, ILogger<AccountLoader> logger)
+        : Loader<TLAccount, Account>(authService, trueLayerApi, dataStore, logger)
     {
-        private readonly ProviderService _providerService;
-
-        public AccountLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore, ProviderService providerService)
-            : base(authService, trueLayerApi, dataStore)
-        {
-            _providerService = providerService;
-        }
+        private readonly ProviderService _providerService = providerService;
 
         public async Task<Account[]> Load()
         {

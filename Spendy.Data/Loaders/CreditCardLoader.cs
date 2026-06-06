@@ -1,5 +1,6 @@
 ﻿namespace Spendy.Data.Loaders
 {
+    using Microsoft.Extensions.Logging;
     using Spendy.Data.Models;
     using System;
     using System.Collections.Generic;
@@ -8,15 +9,10 @@
     using TrueLayer.API;
     using TrueLayer.API.Models;
 
-    public class CreditCardLoader : Loader<TLCard, Card>
+    public class CreditCardLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore, ProviderService providerService, ILogger<CreditCardLoader> logger)
+        : Loader<TLCard, Card>(authService, trueLayerApi, dataStore, logger)
     {
-        private readonly ProviderService _providerService;
-
-        public CreditCardLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore, ProviderService providerService)
-            : base(authService, trueLayerApi, dataStore)
-        {
-            _providerService = providerService;
-        }
+        private readonly ProviderService _providerService = providerService;
 
         public async Task<Card[]> Load()
         {
@@ -77,6 +73,9 @@
                     AuthId = auth.Id,
                     AccountId = card.AccountId,
                     DisplayName = card.DisplayName,
+                    PartialCardNumber = card.PartialCardNumber,
+                    CardType = card.CardType,
+                    CardNetwork = card.CardNetwork,
                     AvailableBalance = card.Balance.Available,
                     CurrentBalance = card.Balance.Current,
                     CreditLimit = card.Balance.CreditLimit,

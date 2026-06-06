@@ -1,0 +1,43 @@
+info:
+  name: Refresh Access Token
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: https://auth.truelayer.com/connect/token
+
+  headers:
+    - name: Content-Type
+      value: application/x-www-form-urlencoded
+
+  body:
+    type: form-urlencoded
+    data:
+      - name: grant_type
+        value: refresh_token
+
+      - name: client_id
+        value: "{{clientId}}"
+
+      - name: client_secret
+        value: "{{clientSecret}}"
+
+      - name: refresh_token
+        value: "{{refreshToken}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |
+        const body = res.getBody();
+
+        // Store new access token
+        if (body.access_token) {
+          bru.setEnvVar("accessToken", body.access_token);
+        }
+
+        // Store rotated refresh token (TrueLayer may rotate it)
+        if (body.refresh_token) {
+          bru.setEnvVar("refreshToken", body.refresh_token);
+        }

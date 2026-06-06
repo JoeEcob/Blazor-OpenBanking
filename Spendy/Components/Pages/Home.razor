@@ -48,6 +48,10 @@
                     <div class="account clickable @selected" @onclick="@(e => FetchCardTransactions(card.AuthId, card.AccountId))">
                         <div class="text-wrapper">
                             <div class="title">@card.DisplayName<span class="value">@card.CurrentBalance.ToString("C")</span></div>
+                            @if (!string.IsNullOrEmpty(card.PartialCardNumber))
+                            {
+                                <div><em>@card.CardNetwork @card.CardType</em><span class="value">•••• @card.PartialCardNumber</span></div>
+                            }
                             <div><em>Available</em><span class="value">@card.AvailableBalance.ToString("C")</span></div>
                         </div>
 

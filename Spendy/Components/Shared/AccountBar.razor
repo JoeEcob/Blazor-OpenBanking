@@ -15,7 +15,7 @@
                 {
                     <img src="@account.Provider.LogoUrl" />
                 }
-                <span>@account.DisplayName</span>
+                <span>@account.ResolvedDisplayName</span>
                 <span class="chip-balance">@account.CurrentBalance.ToString("C")</span>
             </button>
         }
@@ -24,7 +24,7 @@
             var active = card.AccountId == SelectedAccountId ? "active" : "";
             <button class="account-chip @active"
                     @onclick="@(() => OnCardSelected.InvokeAsync((card.AuthId, card.AccountId)))">
-                <span>@card.DisplayName</span>
+                <span>@card.ResolvedDisplayName</span>
                 <span class="chip-balance">@card.CurrentBalance.ToString("C")</span>
             </button>
         }

@@ -34,7 +34,7 @@
                 accounts.AddRange(loadedAccs);
             }
 
-            return accounts.ToArray();
+            return [.. accounts.OrderBy(a => a.DisplayOrder ?? int.MaxValue)];
         }
 
         protected override DateTime GetLastUpdateTime(Auth auth, string accountId = null)
@@ -65,29 +65,30 @@
 
         protected override Account[] MapToClasses(Auth auth, TLAccount[] data, string accountId = null)
         {
-            var newAccounts = new List<Account>();
+            var existing = FetchDatabaseData(auth);
 
-            foreach (var account in data)
+            return [.. data.Select(account => new Account
             {
-                newAccounts.Add(new Account
-                {
-                    AuthId = auth.Id,
-                    AccountId = account.AccountId,
-                    DisplayName = account.DisplayName,
-                    AvailableBalance = account.Balance.Available,
-                    CurrentBalance = account.Balance.Current,
-                    Overdraft = account.Balance.Overdraft,
-                    LastUpdated = account.UpdateTimeStamp
-                });
-            }
-
-            return newAccounts.ToArray();
+                AuthId = auth.Id,
+                AccountId = account.AccountId,
+                DisplayName = account.DisplayName,
+                AvailableBalance = account.Balance.Available,
+                CurrentBalance = account.Balance.Current,
+                Overdraft = account.Balance.Overdraft,
+                LastUpdated = account.UpdateTimeStamp,
+                CustomDisplayName = existing
+                    .FirstOrDefault(e => e.AccountId == account.AccountId)
+                    ?.CustomDisplayName,
+                DisplayOrder = existing
+                    .FirstOrDefault(e => e.AccountId == account.AccountId)
+                    ?.DisplayOrder,
+            })];
         }
 
         protected override void SaveToDatabase(Auth auth, Account[] newAccounts, string accountId = null)
         {
             _dataStore.DeleteMany<Account>(x => x.AuthId == auth.Id);
-            _dataStore.InsertMany<Account>(newAccounts.ToArray());
+            _dataStore.InsertMany<Account>([.. newAccounts]);
         }
     }
 }

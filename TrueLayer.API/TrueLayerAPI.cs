@@ -1,6 +1,7 @@
 ﻿namespace TrueLayer.API
 {
     using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
     using System;
     using System.Linq;
     using System.Net.Http;
@@ -8,16 +9,11 @@
     using System.Threading.Tasks;
     using TrueLayer.API.Models;
 
-    public class TrueLayerAPI
+    public class TrueLayerAPI(IConfiguration config, IHttpClientFactory httpClientFactory, ILogger<TrueLayerAPI> logger = null)
     {
-        private readonly HttpClient _apiClient;
-        private readonly string ApiURL;
-
-        public TrueLayerAPI(IConfiguration config, IHttpClientFactory httpClientFactory)
-        {
-            _apiClient = httpClientFactory.CreateClient();
-            ApiURL = config["TrueLayer:ApiUrl"];
-        }
+        private readonly HttpClient _apiClient = httpClientFactory.CreateClient();
+        private readonly string ApiURL = config["TrueLayer:ApiUrl"];
+        protected readonly ILogger _logger = logger;
 
         public async Task<TLAccessTokenMetadata> GetTokenMetadata(string accessToken)
         {
@@ -110,9 +106,12 @@
             }
             else
             {
-                // TODO - create singleton and pass error object - ErrorResponse.cs
                 using var responseStream = await response.Content.ReadAsStreamAsync();
                 var error = await JsonSerializer.DeserializeAsync<TLError>(responseStream);
+
+                if (_logger?.IsEnabled(LogLevel.Error) ?? false)
+                    _logger.LogError("Failed to fetch TrueLayer response: {ErrorDescription}", error.ErrorDescription);
+
                 return null;
             }
         }

@@ -30,7 +30,7 @@
             if (currentTransactions?.Length > 0)
             {
                 var mostRecentTransactionDate = currentTransactions.Max(x => x.Timestamp);
-                return await _trueLayerApi.GetTransactions(auth.AccessToken, accountId, mostRecentTransactionDate, DateTime.UtcNow);
+                return await _trueLayerApi.GetTransactions(auth.AccessToken, accountId, mostRecentTransactionDate, DateTime.UtcNow.AddMinutes(-10));
             }
 
             // Otherwise we fire off a request to get everything
@@ -58,7 +58,7 @@
                 });
             }
 
-            return newTransactions.ToArray();
+            return [.. newTransactions];
         }
 
         protected override void SaveToDatabase(Auth auth, Transaction[] data, string accountId = null)

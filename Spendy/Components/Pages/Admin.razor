@@ -70,6 +70,75 @@
             </tbody>
         </table>
     }
+
+    <h3>Rename Accounts</h3>
+
+    @if (_accounts == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>API Name</th>
+                    <th>Custom Name</th>
+                    <th>Order</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var account in _accounts)
+                {
+                    <tr>
+                        <td>Account</td>
+                        <td>@account.DisplayName @account.AccountType (£@account.AvailableBalance)</td>
+                        <td>
+                            <input type="text"
+                                   value="@account.CustomDisplayName"
+                                   @onchange="@(e => SaveAccountName(account, e.Value?.ToString()))" />
+                        </td>
+                        <td>
+                            <input type="number" style="width:60px"
+                                   value="@account.DisplayOrder"
+                                   @onchange="@(e => SaveAccountOrder(account, e.Value?.ToString()))" />
+                        </td>
+                        <td>
+                            @if (account.CustomDisplayName != null)
+                            {
+                                <button @onclick="@(() => SaveAccountName(account, null))">Clear</button>
+                            }
+                        </td>
+                    </tr>
+                }
+                @foreach (var card in _cards)
+                {
+                    <tr>
+                        <td>Card</td>
+                        <td>@card.DisplayName (**** @card.PartialCardNumber)</td>
+                        <td>
+                            <input type="text"
+                                   value="@card.CustomDisplayName"
+                                   @onchange="@(e => SaveCardName(card, e.Value?.ToString()))" />
+                        </td>
+                        <td>
+                            <input type="number" style="width:60px"
+                                   value="@card.DisplayOrder"
+                                   @onchange="@(e => SaveCardOrder(card, e.Value?.ToString()))" />
+                        </td>
+                        <td>
+                            @if (card.CustomDisplayName != null)
+                            {
+                                <button @onclick="@(() => SaveCardName(card, null))">Clear</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
 
 @code {
@@ -156,4 +225,37 @@
         string.IsNullOrEmpty(value) || value.Length <= 20
             ? value
             : value[..20] + "…";
+
+    private Account[] _accounts;
+    private Card[] _cards;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _accounts = _dataStore.FindAll<Account>();
+        _cards = _dataStore.FindAll<Card>();
+    }
+
+    private void SaveAccountName(Account account, string? name)
+    {
+        account.CustomDisplayName = string.IsNullOrWhiteSpace(name) ? null : name;
+        _dataStore.Update(account.Id, account);
+    }
+
+    private void SaveCardName(Card card, string? name)
+    {
+        card.CustomDisplayName = string.IsNullOrWhiteSpace(name) ? null : name;
+        _dataStore.Update(card.Id, card);
+    }
+
+    private void SaveAccountOrder(Account account, string? value)
+    {
+        account.DisplayOrder = int.TryParse(value, out var n) ? n : null;
+        _dataStore.Update(account.Id, account);
+    }
+
+    private void SaveCardOrder(Card card, string? value)
+    {
+        card.DisplayOrder = int.TryParse(value, out var n) ? n : null;
+        _dataStore.Update(card.Id, card);
+    }
 }

@@ -27,8 +27,16 @@
 
         public DateTime LastTransactionUpdate { get; set; }
 
+        public string? CustomDisplayName { get; set; }
+
+        public int? DisplayOrder { get; set; }
+
         [JsonIgnore]
         [BsonIgnore]
         public Provider Provider { get; set; }
+
+        [JsonIgnore]
+        [BsonIgnore]
+        public string ResolvedDisplayName => CustomDisplayName ?? DisplayName;
     }
 }

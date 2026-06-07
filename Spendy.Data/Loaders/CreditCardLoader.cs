@@ -34,7 +34,7 @@
                 creditCards.AddRange(loadedCards);
             }
 
-            return creditCards.ToArray();
+            return [.. creditCards.OrderBy(a => a.DisplayOrder ?? int.MaxValue)];
         }
 
         protected override DateTime GetLastUpdateTime(Auth auth, string accountId = null)
@@ -65,36 +65,37 @@
 
         protected override Card[] MapToClasses(Auth auth, TLCard[] data, string accountId = null)
         {
-            var newCards = new List<Card>();
+            var existing = FetchDatabaseData(auth);
 
-            foreach (var card in data)
+            return [.. data.Select(card => new Card
             {
-                newCards.Add(new Card
-                {
-                    AuthId = auth.Id,
-                    AccountId = card.AccountId,
-                    DisplayName = card.DisplayName,
-                    PartialCardNumber = card.PartialCardNumber,
-                    CardType = card.CardType,
-                    CardNetwork = card.CardNetwork,
-                    AvailableBalance = card.Balance.Available,
-                    CurrentBalance = card.Balance.Current,
-                    CreditLimit = card.Balance.CreditLimit,
-                    LastStatementBalance = card.Balance.LastStatementBalance,
-                    LastStatementDate = card.Balance.LastStatementDate,
-                    PaymentDue = card.Balance.PaymentDue,
-                    PaymentDueDate = card.Balance.PaymentDueDate,
-                    LastUpdated = card.UpdateTimestamp
-                });
-            }
-
-            return newCards.ToArray();
+                AuthId = auth.Id,
+                AccountId = card.AccountId,
+                DisplayName = card.DisplayName,
+                PartialCardNumber = card.PartialCardNumber,
+                CardType = card.CardType,
+                CardNetwork = card.CardNetwork,
+                AvailableBalance = card.Balance.Available,
+                CurrentBalance = card.Balance.Current,
+                CreditLimit = card.Balance.CreditLimit,
+                LastStatementBalance = card.Balance.LastStatementBalance,
+                LastStatementDate = card.Balance.LastStatementDate,
+                PaymentDue = card.Balance.PaymentDue,
+                PaymentDueDate = card.Balance.PaymentDueDate,
+                LastUpdated = card.UpdateTimestamp,
+                CustomDisplayName = existing
+                    .FirstOrDefault(e => e.AccountId == card.AccountId)
+                    ?.CustomDisplayName,
+                DisplayOrder = existing
+                    .FirstOrDefault(e => e.AccountId == card.AccountId)
+                    ?.DisplayOrder,
+            })];
         }
 
         protected override void SaveToDatabase(Auth auth, Card[] newCards, string accountId = null)
         {
             _dataStore.DeleteMany<Card>(x => x.AuthId == auth.Id);
-            _dataStore.InsertMany<Card>(newCards.ToArray());
+            _dataStore.InsertMany<Card>([.. newCards]);
         }
     }
 }

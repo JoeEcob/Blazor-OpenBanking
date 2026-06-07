@@ -1,7 +1,6 @@
 ﻿namespace Spendy.Data.Datastore
 {
     using LiteDB;
-    using Spendy.Data.Datastore;
     using System;
     using System.Linq;
     using System.Linq.Expressions;

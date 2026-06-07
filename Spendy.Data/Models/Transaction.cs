@@ -1,12 +1,12 @@
 ﻿namespace Spendy.Data.Models
 {
-    using LiteDB;
     using System;
+    using LiteDB;
 
     public class Transaction
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        public Guid Id { get; set; }
 
         public string AccountId { get; set; }
 

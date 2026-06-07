@@ -1,6 +1,7 @@
 ﻿namespace Spendy.Data.Loaders
 {
     using Microsoft.Extensions.Logging;
+    using Spendy.Data.Datastore;
     using Spendy.Data.Models;
     using System;
     using System.Collections.Generic;
@@ -9,7 +10,7 @@
     using TrueLayer.API;
     using TrueLayer.API.Models;
 
-    public class CreditCardTransactionLoader(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore, ILogger<CreditCardTransactionLoader> logger)
+    public class CreditCardTransactionLoader(AuthService authService, TrueLayerAPI trueLayerApi, IDatastore dataStore, ILogger<CreditCardTransactionLoader> logger)
         : Loader<TLTransaction, Transaction>(authService, trueLayerApi, dataStore, logger)
     {
         protected override DateTime GetLastUpdateTime(Auth auth, string accountId = null)

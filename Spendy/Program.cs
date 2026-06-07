@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Spendy.Components;
 using Spendy.Data;
+using Spendy.Data.Datastore;
 using Spendy.Data.Loaders;
 using TrueLayer.API;
 
@@ -14,7 +15,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<LiteDBDatastore>();
+// builder.Services.AddSingleton<LiteDBDatastore>();
+builder.Services.AddSingleton<IDatastore, SqliteDatastore>();
 builder.Services.AddSingleton<AuthService>();
 builder.Services.AddSingleton<AccountLoader>();
 builder.Services.AddSingleton<CreditCardLoader>();

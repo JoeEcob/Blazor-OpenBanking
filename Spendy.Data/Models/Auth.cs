@@ -1,11 +1,12 @@
 ﻿namespace Spendy.Data.Models
 {
+    using System;
     using LiteDB;
 
     public class Auth
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        public Guid Id { get; set; }
 
         public string ProviderId { get; set; }
 

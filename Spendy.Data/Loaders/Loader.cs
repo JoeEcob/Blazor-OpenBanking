@@ -2,6 +2,7 @@
 {
     using LiteDB;
     using Microsoft.Extensions.Logging;
+    using Spendy.Data.Datastore;
     using Spendy.Data.Models;
     using System;
     using System.Threading.Tasks;
@@ -13,14 +14,14 @@
     /// </summary>
     /// <typeparam name="T1">The data type we get from the source API.</typeparam>
     /// <typeparam name="T2">The final data type we want to return.</typeparam>
-    public abstract class Loader<T1, T2>(AuthService authService, TrueLayerAPI trueLayerApi, LiteDBDatastore dataStore, ILogger logger = null)
+    public abstract class Loader<T1, T2>(AuthService authService, TrueLayerAPI trueLayerApi, IDatastore dataStore, ILogger logger = null)
     {
         protected readonly AuthService _authService = authService;
         protected readonly TrueLayerAPI _trueLayerApi = trueLayerApi;
-        protected readonly LiteDBDatastore _dataStore = dataStore;
+        protected readonly IDatastore _dataStore = dataStore;
         protected readonly ILogger _logger = logger;
 
-        public async Task<T2[]> Load(ObjectId authId, string accountId = null)
+        public async Task<T2[]> Load(Guid authId, string accountId = null)
         {
             try
             {
@@ -33,7 +34,7 @@
             }
         }
 
-        private async Task<T2[]> LoadInternal(ObjectId authId, string accountId)
+        private async Task<T2[]> LoadInternal(Guid authId, string accountId)
         {
             var dataTypeName = typeof(T1).Name;
             LogInfo("Loading {DataTypeName} for authId: {AuthId}, accountId: {AccountId}", dataTypeName, authId, accountId);

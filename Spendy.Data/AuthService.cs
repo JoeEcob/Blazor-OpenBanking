@@ -1,22 +1,16 @@
 ﻿namespace Spendy.Data
 {
+    using Spendy.Data.Datastore;
     using Spendy.Data.Models;
     using System.Threading.Tasks;
     using TrueLayer.API;
     using TrueLayer.API.Models;
 
-    public class AuthService
+    public class AuthService(IDatastore dataStore, TrueLayerAuth trueLayerAuth, TrueLayerAPI trueLayerApi)
     {
-        private readonly LiteDBDatastore _dataStore;
-        private readonly TrueLayerAuth _trueLayerAuth;
-        private readonly TrueLayerAPI _trueLayerApi;
-
-        public AuthService(LiteDBDatastore dataStore, TrueLayerAuth trueLayerAuth, TrueLayerAPI trueLayerApi)
-        {
-            _dataStore = dataStore;
-            _trueLayerAuth = trueLayerAuth;
-            _trueLayerApi = trueLayerApi;
-        }
+        private readonly IDatastore _dataStore = dataStore;
+        private readonly TrueLayerAuth _trueLayerAuth = trueLayerAuth;
+        private readonly TrueLayerAPI _trueLayerApi = trueLayerApi;
 
         public string GetAuthUrl() => _trueLayerAuth.GetAuthUrl();
 

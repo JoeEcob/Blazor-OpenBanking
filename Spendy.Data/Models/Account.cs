@@ -1,14 +1,15 @@
 ﻿namespace Spendy.Data.Models
 {
-    using LiteDB;
     using System;
+    using System.Text.Json.Serialization;
+    using LiteDB;
 
     public class Account
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        public Guid Id { get; set; }
 
-        public ObjectId AuthId { get; set; }
+        public Guid AuthId { get; set; }
 
         // ID from TrueLayer
         public string AccountId { get; set; }
@@ -25,6 +26,7 @@
 
         public DateTime LastTransactionUpdate { get; set; }
 
+        [JsonIgnore]
         [BsonIgnore]
         public Provider Provider { get; set; }
     }

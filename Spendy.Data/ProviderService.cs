@@ -1,22 +1,16 @@
 ﻿namespace Spendy.Data
 {
+    using Spendy.Data.Datastore;
     using Spendy.Data.Models;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using TrueLayer.API;
-    using TrueLayer.API.Models;
 
-    public class ProviderService
+    public class ProviderService(IDatastore dataStore, TrueLayerAuth trueLayerAuth)
     {
-        private readonly LiteDBDatastore _dataStore;
-        private readonly TrueLayerAuth _trueLayerAuth;
-
-        public ProviderService(LiteDBDatastore dataStore, TrueLayerAuth trueLayerAuth)
-        {
-            _dataStore = dataStore;
-            _trueLayerAuth = trueLayerAuth;
-        }
+        private readonly IDatastore _dataStore = dataStore;
+        private readonly TrueLayerAuth _trueLayerAuth = trueLayerAuth;
 
         // Lazy load our list of providers. If we haven't populated the DB yet, go and fetch the data.
         public async Task<Provider> GetProvider(string providerId)

@@ -113,13 +113,13 @@
         }
     }
 
-    private async Task FetchTransactions(LiteDB.ObjectId authId, string accountId)
+    private async Task FetchTransactions(Guid authId, string accountId)
     {
         selectedAccountId = accountId;
         transactions = await _transactionLoader.Load(authId, accountId);
     }
 
-    private async Task FetchCardTransactions(LiteDB.ObjectId authId, string accountId)
+    private async Task FetchCardTransactions(Guid authId, string accountId)
     {
         selectedAccountId = accountId;
         transactions = await _creditCardTransactionLoader.Load(authId, accountId);

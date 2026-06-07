@@ -1,0 +1,159 @@
+@page "/admin"
+@rendermode InteractiveServer
+
+@inject IDatastore _dataStore
+
+<h2>Admin</h2>
+
+<div class="admin-form">
+    <h3>Set Tokens</h3>
+
+    <div class="form-group">
+        <label for="providerId">Provider ID</label>
+        <input id="providerId" type="text" @bind="_providerId" placeholder="e.g. oauth2-monzo" />
+    </div>
+
+    <div class="form-group">
+        <label for="accessToken">Access Token</label>
+        <textarea id="accessToken" rows="4" @bind="_accessToken" placeholder="Paste access token..." />
+    </div>
+
+    <div class="form-group">
+        <label for="refreshToken">Refresh Token</label>
+        <textarea id="refreshToken" rows="4" @bind="_refreshToken" placeholder="Paste refresh token..." />
+    </div>
+
+    <button @onclick="SaveTokens" disabled="@_isSaving">
+        @(_isSaving ? "Saving..." : "Save Tokens")
+    </button>
+
+    @if (_message != null)
+    {
+        <p class="message @_messageClass">@_message</p>
+    }
+</div>
+
+<div class="admin-existing">
+    <h3>Existing Auth Records</h3>
+
+    @if (_authRecords == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else if (!_authRecords.Any())
+    {
+        <p>No auth records found.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>Provider ID</th>
+                    <th>Access Token</th>
+                    <th>Refresh Token</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in _authRecords)
+                {
+                    <tr>
+                        <td>@record.ProviderId</td>
+                        <td class="token-cell" title="@record.AccessToken">@Truncate(record.AccessToken)</td>
+                        <td class="token-cell" title="@record.RefreshToken">@Truncate(record.RefreshToken)</td>
+                        <td>
+                            <button @onclick="@(() => PopulateForm(record))">Edit</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private string _providerId;
+    private string _accessToken;
+    private string _refreshToken;
+    private bool _isSaving;
+    private string _message;
+    private string _messageClass;
+    private Auth[] _authRecords;
+
+    protected override void OnInitialized()
+    {
+        LoadRecords();
+    }
+
+    private void LoadRecords()
+    {
+        _authRecords = _dataStore.FindAll<Auth>();
+    }
+
+    private void PopulateForm(Auth record)
+    {
+        _providerId = record.ProviderId;
+        _accessToken = record.AccessToken;
+        _refreshToken = record.RefreshToken;
+        _message = null;
+    }
+
+    private void SaveTokens()
+    {
+        if (string.IsNullOrWhiteSpace(_providerId) ||
+            string.IsNullOrWhiteSpace(_accessToken) ||
+            string.IsNullOrWhiteSpace(_refreshToken))
+        {
+            SetMessage("All fields are required.", isError: true);
+            return;
+        }
+
+        _isSaving = true;
+
+        try
+        {
+            var existing = _dataStore.FindOne<Auth>(x => x.ProviderId == _providerId);
+
+            if (existing != null)
+            {
+                existing.AccessToken = _accessToken;
+                existing.RefreshToken = _refreshToken;
+                _dataStore.Update(existing.Id, existing);
+                SetMessage($"Updated tokens for '{_providerId}'.", isError: false);
+            }
+            else
+            {
+                var newAuth = new Auth
+                {
+                    ProviderId = _providerId,
+                    AccessToken = _accessToken,
+                    RefreshToken = _refreshToken
+                };
+                newAuth.Id = _dataStore.Insert(newAuth);
+                SetMessage($"Saved new tokens for '{_providerId}'.", isError: false);
+            }
+
+            LoadRecords();
+        }
+        catch (Exception ex)
+        {
+            SetMessage($"Error: {ex.Message}", isError: true);
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void SetMessage(string text, bool isError)
+    {
+        _message = text;
+        _messageClass = isError ? "error" : "success";
+    }
+
+    private static string Truncate(string value) =>
+        string.IsNullOrEmpty(value) || value.Length <= 20
+            ? value
+            : value[..20] + "…";
+}

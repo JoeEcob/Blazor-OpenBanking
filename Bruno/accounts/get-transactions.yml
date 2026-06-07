@@ -1,23 +1,26 @@
 info:
   name: Get Transactions
   type: http
-  seq: 3
+  seq: 4
 
 http:
   method: GET
-  url: "{{baseUrl}}/accounts/{{accountId}}/transactions"
-
-  params:
-    query:
-      - name: from
-        value: "2025-01-01"
-
-      - name: to
-        value: "2025-12-31"
-
+  url: "{{baseUrl}}/accounts/{{accountId}}/transactions?from=2026-05-01&to=2026-06-01"
   headers:
     - name: Authorization
-      value: "Bearer {{accessToken}}"
-
+      value: Bearer {{accessToken}}
     - name: Accept
       value: application/json
+  params:
+    - name: from
+      value: 2026-05-01
+      type: query
+    - name: to
+      value: 2026-06-01
+      type: query
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -30,7 +30,7 @@
             if (currentTransactions?.Length > 0)
             {
                 var mostRecentTransactionDate = currentTransactions.Max(x => x.Timestamp);
-                return await _trueLayerApi.GetCardTransactions(auth.AccessToken, accountId, mostRecentTransactionDate, DateTime.UtcNow);
+                return await _trueLayerApi.GetCardTransactions(auth.AccessToken, accountId, mostRecentTransactionDate, DateTime.UtcNow.AddMinutes(-10));
             }
 
             // Otherwise we fire off a request to get everything
@@ -66,8 +66,10 @@
             // Since we've done the check for existing transactions, we can insert without deleting
             // as these should all be new.
             _dataStore.InsertMany<Transaction>(data);
+        }
 
-            // Update the accounts with the new fetch time
+        protected override void UpdateLastFetchTime(string accountId)
+        {
             var account = _dataStore.FindOne<Card>(x => x.AccountId == accountId);
             account.LastTransactionUpdate = DateTime.UtcNow;
             _dataStore.Update(account.Id, account);

@@ -92,6 +92,9 @@
                 LogInfo("Saved {RecordCount} {DataTypeName} records to database.", translatedData.Length, dataTypeName);
             }
 
+            // Even if there is no new data, update the last fetch time to stop re-fetching.
+            UpdateLastFetchTime(accountId);
+
             // We need to return DB data because sometimes we only fetch partial data e.g. transactions
             var dbData = FetchDatabaseData(provider, accountId);
             LogInfo("Returning {RecordCount} {DataTypeName} records from database.", dbData?.Length ?? 0, dataTypeName);
@@ -122,5 +125,6 @@
         protected abstract Task<TLApiResponse<T1>> FetchApiData(Auth auth, string accountId = null);
         protected abstract T2[] MapToClasses(Auth auth, T1[] data, string accountId = null);
         protected abstract void SaveToDatabase(Auth auth, T2[] data, string accountId = null);
+        protected abstract void UpdateLastFetchTime(string accountId);
     }
 }

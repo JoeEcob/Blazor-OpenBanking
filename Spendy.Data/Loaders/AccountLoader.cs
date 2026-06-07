@@ -76,6 +76,9 @@
                 CurrentBalance = account.Balance.Current,
                 Overdraft = account.Balance.Overdraft,
                 LastUpdated = account.UpdateTimeStamp,
+                LastTransactionUpdate = existing
+                    .FirstOrDefault(e => e.AccountId == account.AccountId)
+                    ?.LastTransactionUpdate ?? DateTime.MinValue,
                 CustomDisplayName = existing
                     .FirstOrDefault(e => e.AccountId == account.AccountId)
                     ?.CustomDisplayName,
@@ -90,5 +93,8 @@
             _dataStore.DeleteMany<Account>(x => x.AuthId == auth.Id);
             _dataStore.InsertMany<Account>([.. newAccounts]);
         }
+
+        // No need to update here as it's done when mapping classes.
+        protected override void UpdateLastFetchTime(string accountId) { }
     }
 }

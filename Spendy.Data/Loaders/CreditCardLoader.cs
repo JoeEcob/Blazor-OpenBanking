@@ -83,6 +83,9 @@
                 PaymentDue = card.Balance.PaymentDue,
                 PaymentDueDate = card.Balance.PaymentDueDate,
                 LastUpdated = card.UpdateTimestamp,
+                LastTransactionUpdate = existing
+                    .FirstOrDefault(e => e.AccountId == card.AccountId)
+                    ?.LastTransactionUpdate ?? DateTime.MinValue,
                 CustomDisplayName = existing
                     .FirstOrDefault(e => e.AccountId == card.AccountId)
                     ?.CustomDisplayName,
@@ -97,5 +100,8 @@
             _dataStore.DeleteMany<Card>(x => x.AuthId == auth.Id);
             _dataStore.InsertMany<Card>([.. newCards]);
         }
+
+        // No need to update here as it's done when mapping classes.
+        protected override void UpdateLastFetchTime(string accountId) { }
     }
 }

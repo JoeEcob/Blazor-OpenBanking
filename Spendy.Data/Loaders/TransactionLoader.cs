@@ -66,8 +66,10 @@
             // Since we've done the check for existing transactions, we can insert without deleting
             // as these should all be new.
             _dataStore.InsertMany<Transaction>(data);
+        }
 
-            // Update the accounts with the new fetch time
+        protected override void UpdateLastFetchTime(string accountId)
+        {
             var account = _dataStore.FindOne<Account>(x => x.AccountId == accountId);
             account.LastTransactionUpdate = DateTime.UtcNow;
             _dataStore.Update(account.Id, account);

@@ -1,0 +1,47 @@
+@rendermode InteractiveServer
+
+@inject AccountLoader _accountLoader
+@inject CreditCardLoader _creditCardLoader
+
+@if (_accounts != null)
+{
+    <div class="account-bar">
+        @foreach (var account in _accounts)
+        {
+            var active = account.AccountId == SelectedAccountId ? "active" : "";
+            <button class="account-chip @active"
+                    @onclick="@(() => OnAccountSelected.InvokeAsync((account.AuthId, account.AccountId)))">
+                @if (account.Provider?.LogoUrl != null)
+                {
+                    <img src="@account.Provider.LogoUrl" />
+                }
+                <span>@account.DisplayName</span>
+                <span class="chip-balance">@account.CurrentBalance.ToString("C")</span>
+            </button>
+        }
+        @foreach (var card in _cards)
+        {
+            var active = card.AccountId == SelectedAccountId ? "active" : "";
+            <button class="account-chip @active"
+                    @onclick="@(() => OnCardSelected.InvokeAsync((card.AuthId, card.AccountId)))">
+                <span>@card.DisplayName</span>
+                <span class="chip-balance">@card.CurrentBalance.ToString("C")</span>
+            </button>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string SelectedAccountId { get; set; }
+    [Parameter] public EventCallback<(Guid AuthId, string AccountId)> OnAccountSelected { get; set; }
+    [Parameter] public EventCallback<(Guid AuthId, string AccountId)> OnCardSelected { get; set; }
+
+    private Account[] _accounts = [];
+    private Card[] _cards = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _accounts = await _accountLoader.Load();
+        _cards = await _creditCardLoader.Load();
+    }
+}

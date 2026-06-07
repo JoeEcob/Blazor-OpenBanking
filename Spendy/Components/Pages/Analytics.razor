@@ -1,4 +1,5 @@
-@page "/graphs"
+@page "/analytics"
+@using Spendy.Components.Shared
 @rendermode RenderMode.InteractiveServer
 
 @inject AccountLoader _accountLoader
@@ -6,7 +7,7 @@
 @inject TransactionLoader _transactionLoader
 @inject CreditCardTransactionLoader _creditCardTransactionLoader
 
-<div class="graphs-container">
+<div class="analytics-container">
     <h1>Analytics</h1>
 
     @if (isLoading)
@@ -15,23 +16,32 @@
     }
     else
     {
-        <div class="account-selector">
-            <label for="accountSelect">Select Account:</label>
-            <select id="accountSelect" @onchange="HandleAccountChange" class="form-control">
-                <option value="">-- Select an account --</option>
-                @foreach (var account in accounts)
-                {
-                    <option value="@account.AccountId">@account.DisplayName</option>
-                }
-                @foreach (var card in creditCards)
-                {
-                    <option value="@card.AccountId">@card.DisplayName @(!string.IsNullOrEmpty(card.PartialCardNumber) ? $"(•••• {card.PartialCardNumber})" : "")</option>
-                }
-            </select>
-        </div>
+        <AccountBar SelectedAccountId="@selectedAccountId"
+                    OnAccountSelected="@(e => FetchTransactions(e.AuthId, e.AccountId))"
+                    OnCardSelected="@(e => FetchCardTransactions(e.AuthId, e.AccountId))" />
+
 
         @if (!string.IsNullOrEmpty(selectedAccountId) && transactions?.Length > 0)
         {
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <h4>Total Transactions</h4>
+                    <p>@transactions.Length</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Spent</h4>
+                    <p>@transactions.Where(t => t.Amount < 0).Sum(t => t.Amount).ToString("C")</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Income</h4>
+                    <p>@transactions.Where(t => t.Amount > 0).Sum(t => t.Amount).ToString("C")</p>
+                </div>
+                <div class="stat-card">
+                    <h4>Average Transaction</h4>
+                    <p>@(transactions.Length > 0 ? (transactions.Sum(t => t.Amount) / transactions.Length).ToString("C") : "$0.00")</p>
+                </div>
+            </div>
+
             <div class="charts-grid">
                 <div class="chart-card">
                     <h3>Spending Over Time</h3>
@@ -90,29 +100,6 @@
                     </ApexChart>
                 </div>
             </div>
-
-            <div class="summary-stats">
-                <div class="stat-card">
-                    <h4>Total Transactions</h4>
-                    <p>@transactions.Length</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Total Spent</h4>
-                    <p>@transactions.Where(t => t.Amount < 0).Sum(t => t.Amount).ToString("C")</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Total Income</h4>
-                    <p>@transactions.Where(t => t.Amount > 0).Sum(t => t.Amount).ToString("C")</p>
-                </div>
-                <div class="stat-card">
-                    <h4>Average Transaction</h4>
-                    <p>@(transactions.Length > 0 ? (transactions.Sum(t => t.Amount) / transactions.Length).ToString("C") : "$0.00")</p>
-                </div>
-            </div>
-        }
-        else if (string.IsNullOrEmpty(selectedAccountId))
-        {
-            <p>Please select an account to view analytics.</p>
         }
         else
         {
@@ -147,6 +134,13 @@
     {
         accounts = await _accountLoader.Load();
         creditCards = await _creditCardLoader.Load();
+
+        if (accounts.Any())
+        {
+            var firstAccount = accounts.First();
+            await FetchTransactions(firstAccount.AuthId, firstAccount.AccountId);
+        }
+
         isLoading = false;
 
         InitializeChartOptions();
@@ -186,28 +180,22 @@
         };
     }
 
-    private async Task HandleAccountChange(ChangeEventArgs e)
+    private async Task FetchTransactions(Guid authId, string accountId)
     {
-        selectedAccountId = e.Value?.ToString() ?? "";
-        if (!string.IsNullOrEmpty(selectedAccountId))
-        {
-            var account = accounts.FirstOrDefault(a => a.AccountId == selectedAccountId);
-            if (account != null)
-            {
-                transactions = await _transactionLoader.Load(account.AuthId, selectedAccountId);
-            }
-            else
-            {
-                var card = creditCards.FirstOrDefault(c => c.AccountId == selectedAccountId);
-                if (card != null)
-                {
-                    transactions = await _creditCardTransactionLoader.Load(card.AuthId, selectedAccountId);
-                }
-            }
+        selectedAccountId = accountId;
+        transactions = await _transactionLoader.Load(authId, accountId);
 
-            UpdateCharts();
-            await RefreshCharts();
-        }
+        UpdateCharts();
+        await RefreshCharts();
+    }
+
+    private async Task FetchCardTransactions(Guid authId, string accountId)
+    {
+        selectedAccountId = accountId;
+        transactions = await _creditCardTransactionLoader.Load(authId, accountId);
+
+        UpdateCharts();
+        await RefreshCharts();
     }
 
     private async Task RefreshCharts()
@@ -292,84 +280,3 @@
         public decimal Amount { get; set; }
     }
 }
-
-<style>
-    .graphs-container {
-        padding: 20px;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    .graphs-container h1 {
-        margin-bottom: 30px;
-    }
-
-    .account-selector {
-        margin-bottom: 30px;
-    }
-
-    .account-selector label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-    }
-
-    .account-selector select {
-        width: 100%;
-        max-width: 300px;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        font-size: 14px;
-    }
-
-    .charts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .chart-card {
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .chart-card h3 {
-        margin: 0 0 20px 0;
-        font-size: 16px;
-        color: #333;
-    }
-
-    .summary-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-    }
-
-    .stat-card {
-        background: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .stat-card h4 {
-        margin: 0 0 10px 0;
-        font-size: 14px;
-        color: #666;
-        text-transform: uppercase;
-    }
-
-    .stat-card p {
-        margin: 0;
-        font-size: 24px;
-        font-weight: 700;
-        color: #333;
-    }
-</style>

@@ -1,175 +1,109 @@
 :root {
-    --color-blue-primary: #45ada8;
-    --color-blue-secondary: #32c0b9;
-    --color-text-primary: #222;
-    --color-text-secondary: #606c76;
+  --color-blue-primary: #45ada8;
+  --color-blue-secondary: #32c0b9;
+  --color-text-primary: #222;
+  --color-text-secondary: #555;
 }
 
-html { line-height: 1.15; }
+html {
+  line-height: 1.15;
+}
 
 body {
-    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue",sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family:
+    Arial, Helvetica, sans-serif, Menlo, Monaco, Consolas, "Courier New";
 }
 
-app {
-    color: var(--color-text-primary);
-    font-size: 16px;
-    margin: 0 auto 2rem;
-    max-width: 1400px;
-    padding: 0 2rem;
-    display: block;
+.main {
+  color: var(--color-text-primary);
+  font-size: 16px;
+  margin: 0 auto 2rem;
+  max-width: 1200px;
+  padding: 0 2rem;
+  display: block;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-weight: lighter;
-    margin: 0 0 1.2rem;
-    color: #606c76;
-    color: var(--color-text-secondary);
+.main h1 {
+  margin-bottom: 30px;
 }
 
-p { margin: 0 0 1rem 0; }
-img { display: block; }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: normal;
+  margin: 0 0 1.2rem;
+  color: #606c76;
+  color: var(--color-text-secondary);
+}
+
+p {
+  margin: 0 0 1rem 0;
+}
+img {
+  display: block;
+}
 
 button {
-    border: 0;
-    cursor: pointer;
-    padding: .5rem 1rem;
+  border: 0;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
 }
 button:hover {
-    background-color: #ddd;
+  background-color: #ddd;
 }
 
-.clickable { cursor: pointer; }
+.clickable {
+  cursor: pointer;
+}
 
 header {
-    text-align: center;
-    width: 100%;
+  text-align: center;
+  width: 100%;
 }
 header a {
-    text-decoration: none;
+  text-decoration: none;
 }
 header h1 {
-    color: var(--color-blue-primary);
-    font-size: 3rem;
-    margin: 1.5rem 0;
+  color: var(--color-blue-primary);
+  font-size: 3rem;
+  margin: 1.5rem 0;
 }
 header nav {
-    border-top: 1px solid #594f4f;
-    border-bottom: 1px solid #594f4f;
-    padding: 1rem 0;
-    margin-bottom: 2rem;
+  border-top: 1px solid #594f4f;
+  border-bottom: 1px solid #594f4f;
+  padding: 1rem 0;
+  margin-bottom: 2rem;
 }
 header nav a {
-    color: #594f4f;
-    text-decoration: none;
-    padding: .5rem 0;
-    margin: 0 1rem;
+  color: #594f4f;
+  text-decoration: none;
+  padding: 0.5rem 0;
+  margin: 0 1rem;
 }
 header nav a.active {
-    border-bottom: 1px solid var(--color-text-primary);
+  border-bottom: 1px solid var(--color-text-primary);
 }
 header nav a:hover {
-    color: var(--color-blue-secondary);
-    border-bottom: 1px solid var(--color-blue-secondary);
+  color: var(--color-blue-secondary);
+  border-bottom: 1px solid var(--color-blue-secondary);
 }
 
 #blazor-error-ui {
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
-}
-
-.year-progress {
-    display: block;
-}
-.year-progress .graph-container {
-    display: inline-block;
-    width: 300px;
-    height: 30px;
-    border: 1px solid #ddd;
-}
-.year-progress .percentage {
-    display: inline-block;
-    height: 100%;
-    background-color: green;
-}
-.year-progress .label {
-    display: inline-block;
-    margin-top: .4rem;
-    margin-left: 1rem;
-    vertical-align: top;
-}
-
-.dashboard .add-new {
-    margin-bottom: 2rem;
-    width: 100%;
-}
-.dashboard .flex-grid {
-    display: flex;
-}
-.dashboard-accounts {
-    flex: 1 1 25%;
-    padding-right: 1rem;
-}
-.dashboard-accounts .account {
-    padding: .5rem;
-    display: flex;
-    font-size: .8rem;
-    margin-bottom: .5rem;
-}
-.dashboard-accounts .account.selected {
-    border-right: 2px solid var(--color-blue-primary);
-}
-.dashboard-accounts .account:hover {
-    background-color: #eee;
-} 
-.dashboard-accounts .account .title {
-    flex: 1 1 100%;
-    font-size: 1rem;
-}
-.dashboard-accounts .account .text-wrapper {
-    flex: 1 1 80%;
-    padding-right: 1rem;
-    margin-bottom: 1rem;
-}
-.dashboard-accounts .account .value {
-    float: right;
-}
-.dashboard-accounts .account .account-logo {
-    flex: 1 1 20%;
-}
-.dashboard-transactions {
-    flex: 1 1 75%;
-}
-.dashboard-transactions h2 {
-    margin: 0 0 .9rem;
-}
-.dashboard-transactions .transaction {
-    padding: .5rem .2rem;
-}
-.dashboard-transactions .transaction:hover {
-    background-color: #eee;
-}
-.dashboard-transactions .transaction-title {
-    padding: .5rem .2rem;
-    margin: 1rem 0 0;
-}
-.dashboard-transactions .transaction .date {
-    padding-right: .5rem;
-    display: inline-block;
-    font-size: .8rem;
-    font-weight: lighter;
-    width: 65px;
-}
-.dashboard-transactions .transaction .amount {
-    float: right;
+  bottom: 0;
+  box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+  display: none;
+  left: 0;
+  padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
 }

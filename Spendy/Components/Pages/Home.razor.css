@@ -1,0 +1,94 @@
+.dashboard .add-new {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+.dashboard .flex-grid {
+  display: flex;
+}
+.dashboard-accounts {
+  flex: 1 1 25%;
+  padding-right: 1rem;
+}
+.dashboard-accounts .account {
+  padding: 0.5rem;
+  display: flex;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+.dashboard-accounts .account.selected {
+  border-right: 2px solid var(--color-blue-primary);
+}
+.dashboard-accounts .account:hover {
+  background-color: #eee;
+}
+.dashboard-accounts .account .title {
+  flex: 1 1 100%;
+  font-size: 1rem;
+}
+.dashboard-accounts .account .text-wrapper {
+  flex: 1 1 80%;
+  padding-right: 1rem;
+  margin-bottom: 1rem;
+}
+.dashboard-accounts .account .value {
+  float: right;
+}
+.dashboard-accounts .account .account-logo {
+  flex: 1 1 20%;
+}
+.dashboard-transactions {
+  flex: 1 1 75%;
+}
+.dashboard-transactions h2 {
+  margin: 0 0 0.9rem;
+}
+.dashboard-transactions .transaction {
+  padding: 0.5rem 0.2rem;
+}
+.dashboard-transactions .transaction:hover {
+  background-color: #eee;
+}
+.dashboard-transactions .transaction-title {
+  padding: 0.5rem 0.2rem;
+  margin: 1rem 0 0;
+}
+.dashboard-transactions .transaction .date {
+  padding-right: 0.5rem;
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: normal;
+  width: 65px;
+}
+.dashboard-transactions .transaction .amount {
+  float: right;
+}
+
+.dashboard-transactions .transaction {
+  display: flex;
+  align-items: baseline;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 1rem;
+}
+
+.dashboard-transactions .transaction .date {
+  flex: 0 0 70px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.dashboard-transactions .transaction .description {
+  flex: 1 1 auto;
+}
+
+.dashboard-transactions .transaction .amount {
+  flex: 0 0 auto;
+  font-weight: 600;
+}
+
+.dashboard-transactions .transaction .amount.debit {
+  color: #c0392b;
+}
+.dashboard-transactions .transaction .amount.credit {
+  color: #27ae60;
+}

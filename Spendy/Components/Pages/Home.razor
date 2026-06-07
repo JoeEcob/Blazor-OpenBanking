@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Spendy.Components.Shared
 @rendermode InteractiveServer
 
 @inject AuthService _authService
@@ -8,6 +9,8 @@
 @inject CreditCardTransactionLoader _creditCardTransactionLoader
 
 <div class="dashboard">
+    <h1>Transactions</h1>
+
     @if (isLoading)
     {
         <p><em>Loading...</em></p>
@@ -18,75 +21,29 @@
             <a href=@_authService.GetAuthUrl()>Add new account</a>
         </div>
 
-        <div class="flex-grid">
-            <section class="dashboard-accounts">
+        <AccountBar SelectedAccountId="@selectedAccountId"
+                    OnAccountSelected="@(e => FetchTransactions(e.AuthId, e.AccountId))"
+                    OnCardSelected="@(e => FetchCardTransactions(e.AuthId, e.AccountId))" />
 
-                <h2>Accounts</h2>
-                @foreach (var account in accounts)
-                {
-                    var selected = account.AccountId == selectedAccountId ? "selected" : "";
-                    <div class="account clickable @selected" @onclick="@(e => FetchTransactions(account.AuthId, account.AccountId))">
-                        <div class="text-wrapper">
-                            <div class="title">@account.DisplayName<span class="value">@account.CurrentBalance.ToString("C")</span></div>
-                            <div><em>Available</em><span class="value">@account.AvailableBalance.ToString("C")</span></div>
-                            <div><em>Overdraft</em><span class="value">@account.Overdraft.ToString("C")</span></div>
-                        </div>
+        <div class="dashboard-transactions">
+            @{int previousMonth = -1;}
+            <Virtualize Items="transactions" Context="transaction">
+                <div @key="transaction.Id">
+                    @if (transaction.Timestamp.Month != previousMonth)
+                    {
+                        previousMonth = transaction.Timestamp.Month;
+                        <h3 class="transaction-title">@transaction.Timestamp.ToString("MMMM yyyy")</h3>
+                    }
 
-                        @if (account.Provider.LogoUrl != null)
-                        {
-                            <span class="account-logo">
-                                <img src="@account.Provider.LogoUrl" />
-                            </span>
-                        }
+                    <div class="transaction">
+                        <span class="date" title="@transaction.Timestamp.ToString("G")">@transaction.Timestamp.ToString("d MMM")</span>
+                        <span class="description">@transaction.Description</span>
+                        <span class="amount @(transaction.Amount < 0 ? "debit" : "credit")">
+                            @transaction.Amount.ToString("C")
+                        </span>
                     </div>
-                }
-
-                <h2>Credit Cards</h2>
-                @foreach (var card in creditCards)
-                {
-                    var selected = card.AccountId == selectedAccountId ? "selected" : "";
-                    <div class="account clickable @selected" @onclick="@(e => FetchCardTransactions(card.AuthId, card.AccountId))">
-                        <div class="text-wrapper">
-                            <div class="title">@card.DisplayName<span class="value">@card.CurrentBalance.ToString("C")</span></div>
-                            @if (!string.IsNullOrEmpty(card.PartialCardNumber))
-                            {
-                                <div><em>@card.CardNetwork @card.CardType</em><span class="value">•••• @card.PartialCardNumber</span></div>
-                            }
-                            <div><em>Available</em><span class="value">@card.AvailableBalance.ToString("C")</span></div>
-                        </div>
-
-                        @if (card.Provider.LogoUrl != null)
-                        {
-                            <span class="account-logo">
-                                <img src="@card.Provider.LogoUrl" />
-                            </span>
-                        }
-                    </div>
-                }
-            </section>
-
-            <section class="dashboard-transactions">
-                @if (transactions?.Length > 0)
-                {
-                    <h2>Transactions</h2>
-                    int previousMonth = -1;
-                    <Virtualize Items="transactions" Context="transaction">
-                        <div @key="transaction.Id">
-                            @if (transaction.Timestamp.Month != previousMonth)
-                            {
-                                previousMonth = transaction.Timestamp.Month;
-                                <h3 class="transaction-title">@transaction.Timestamp.ToString("MMMM \\'yy")</h3>
-                            }
-
-                            <div class="transaction">
-                                <span class="date" title="@transaction.Timestamp.ToString("G")">@transaction.Timestamp.ToString("d")</span>
-                                <span class="description">@transaction.Description</span>
-                                <span class="amount">@transaction.Amount.ToString("C")</span>
-                            </div>
-                        </div>
-                    </Virtualize>
-                }
-            </section>
+                </div>
+            </Virtualize>
         </div>
     }
 </div>

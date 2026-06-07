@@ -11,8 +11,9 @@
 
         public Guid AuthId { get; set; }
 
-        // ID from TrueLayer
         public string AccountId { get; set; }
+
+        public string AccountType { get; set; }
 
         public string DisplayName { get; set; }
 

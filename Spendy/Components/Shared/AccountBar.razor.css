@@ -1,0 +1,33 @@
+.account-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.account-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 2rem;
+  background: white;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.account-chip img {
+  height: 18px;
+  width: auto;
+}
+
+.account-chip.active {
+  border-color: var(--color-blue-primary);
+  color: var(--color-blue-primary);
+}
+
+.account-chip .chip-balance {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}

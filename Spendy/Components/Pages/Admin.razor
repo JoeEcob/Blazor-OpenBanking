@@ -6,6 +6,9 @@
 <h2>Admin</h2>
 
 <div class="admin-form">
+
+@if (IsEnabled)
+{
     <h3>Set Tokens</h3>
 
     <div class="form-group">
@@ -31,9 +34,7 @@
     {
         <p class="message @_messageClass">@_message</p>
     }
-</div>
 
-<div class="admin-existing">
     <h3>Existing Auth Records</h3>
 
     @if (_authRecords == null)
@@ -70,6 +71,7 @@
             </tbody>
         </table>
     }
+}
 
     <h3>Rename Accounts</h3>
 
@@ -97,13 +99,13 @@
                         <td>@account.DisplayName @account.AccountType (£@account.AvailableBalance)</td>
                         <td>
                             <input type="text"
-                                   value="@account.CustomDisplayName"
-                                   @onchange="@(e => SaveAccountName(account, e.Value?.ToString()))" />
+                                value="@account.CustomDisplayName"
+                                @onchange="@(e => SaveAccountName(account, e.Value?.ToString()))" />
                         </td>
                         <td>
                             <input type="number" style="width:60px"
-                                   value="@account.DisplayOrder"
-                                   @onchange="@(e => SaveAccountOrder(account, e.Value?.ToString()))" />
+                                value="@account.DisplayOrder"
+                                @onchange="@(e => SaveAccountOrder(account, e.Value?.ToString()))" />
                         </td>
                         <td>
                             @if (account.CustomDisplayName != null)
@@ -120,13 +122,13 @@
                         <td>@card.DisplayName (**** @card.PartialCardNumber)</td>
                         <td>
                             <input type="text"
-                                   value="@card.CustomDisplayName"
-                                   @onchange="@(e => SaveCardName(card, e.Value?.ToString()))" />
+                                value="@card.CustomDisplayName"
+                                @onchange="@(e => SaveCardName(card, e.Value?.ToString()))" />
                         </td>
                         <td>
                             <input type="number" style="width:60px"
-                                   value="@card.DisplayOrder"
-                                   @onchange="@(e => SaveCardOrder(card, e.Value?.ToString()))" />
+                                value="@card.DisplayOrder"
+                                @onchange="@(e => SaveCardOrder(card, e.Value?.ToString()))" />
                         </td>
                         <td>
                             @if (card.CustomDisplayName != null)
@@ -142,6 +144,13 @@
 </div>
 
 @code {
+    private bool IsEnabled =>
+#if DEBUG
+        true;
+#else
+        false;
+#endif
+
     private string _providerId;
     private string _accessToken;
     private string _refreshToken;

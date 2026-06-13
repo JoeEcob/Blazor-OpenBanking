@@ -44,7 +44,7 @@
                         <div class="transaction">
                             <span class="date" title="@transaction.Timestamp.ToString("G")">@transaction.Timestamp.ToString("d MMM")</span>
                             <span class="description">@transaction.Description</span>
-                            <span class="amount @(transaction.Amount < 0 ? "debit" : "credit")">
+                            <span class="amount @(transaction.TransactionType.ToLower())">
                                 @transaction.Amount.ToString("C")
                             </span>
                         </div>

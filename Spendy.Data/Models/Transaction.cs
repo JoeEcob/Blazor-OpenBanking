@@ -28,6 +28,6 @@
 
         public string MerchantName { get; set; }
 
-        public RunningBalance RunningBalance { get; set; }
+        public RunningBalance? RunningBalance { get; set; }
     }
 }

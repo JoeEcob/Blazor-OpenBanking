@@ -38,7 +38,7 @@
                 </div>
                 <div class="stat-card">
                     <h4>Average Transaction</h4>
-                    <p>@(transactions.Length > 0 ? (transactions.Sum(t => t.Amount) / transactions.Length).ToString("C") : "$0.00")</p>
+                    <p>@(transactions.Length > 0 ? (transactions.Sum(t => t.Amount) / transactions.Length).ToString("C") : "£0.00")</p>
                 </div>
             </div>
 
@@ -153,7 +153,7 @@
             Chart = new Chart { Type = ChartType.Line },
             Title = new Title { Text = "" },
             Xaxis = new XAxis { Type = XAxisType.Datetime },
-            Yaxis = new List<YAxis> { new YAxis { Title = new AxisTitle { Text = "Amount ($)" } } }
+            Yaxis = new List<YAxis> { new YAxis { Title = new AxisTitle { Text = "Amount (£)" } } }
         };
 
         dailyChartOptions = new ApexChartOptions<DailySpending>
@@ -161,7 +161,7 @@
             Chart = new Chart { Type = ChartType.Bar },
             Title = new Title { Text = "" },
             Xaxis = new XAxis { Type = XAxisType.Category },
-            Yaxis = new List<YAxis> { new YAxis { Title = new AxisTitle { Text = "Total ($)" } } }
+            Yaxis = new List<YAxis> { new YAxis { Title = new AxisTitle { Text = "Total (£)" } } }
         };
 
         monthlyChartOptions = new ApexChartOptions<MonthlySummary>
@@ -169,7 +169,7 @@
             Chart = new Chart { Type = ChartType.Line },
             Title = new Title { Text = "" },
             Xaxis = new XAxis { Type = XAxisType.Category },
-            Yaxis = new List<YAxis> { new YAxis { Title = new AxisTitle { Text = "Amount ($)" } } }
+            Yaxis = new List<YAxis> { new YAxis { Title = new AxisTitle { Text = "Amount (£)" } } }
         };
 
         categoryChartOptions = new ApexChartOptions<CategorySpending>

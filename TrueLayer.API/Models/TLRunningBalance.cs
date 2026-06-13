@@ -1,7 +1,7 @@
-using System.Text.Json.Serialization;
-
 namespace TrueLayer.API.Models
 {
+    using System.Text.Json.Serialization;
+
     public class RunningBalance
     {
         [JsonPropertyName("amount")]

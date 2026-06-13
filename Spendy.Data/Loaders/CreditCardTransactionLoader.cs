@@ -60,7 +60,7 @@
                     TransactionCategory = transaction.TransactionCategory,
                     TransactionClassification = transaction.TransactionClassification,
                     MerchantName = transaction.MerchantName,
-                    RunningBalance = new Spendy.Data.Models.RunningBalance()
+                    RunningBalance = transaction.RunningBalance is null ? null : new Spendy.Data.Models.RunningBalance()
                     {
                         Amount = transaction.RunningBalance.Amount,
                         Currency = transaction.RunningBalance.Currency,

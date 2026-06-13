@@ -34,7 +34,7 @@
         public string MerchantName { get; set; }
 
         [JsonPropertyName("running_balance")]
-        public object RunningBalance { get; set; }
+        public RunningBalance RunningBalance { get; set; }
 
         [JsonPropertyName("meta")]
         public Dictionary<string, string> Metadata { get; set; }

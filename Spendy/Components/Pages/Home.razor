@@ -26,30 +26,38 @@
                     OnCardSelected="@(e => FetchCardTransactions(e.AuthId, e.AccountId))" />
 
         <div class="dashboard-transactions">
-            @{int previousMonth = -1;}
-            <Virtualize Items="transactions" Context="transaction">
-                <div @key="transaction.Id">
-                    @if (transaction.Timestamp.Month != previousMonth)
-                    {
-                        previousMonth = transaction.Timestamp.Month;
-                        <h3 class="transaction-title">@transaction.Timestamp.ToString("MMMM yyyy")</h3>
-                    }
+            @if (isFetching)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else
+            {
+                int previousMonth = -1;
+                <Virtualize Items="transactions" Context="transaction">
+                    <div @key="transaction.Id">
+                        @if (transaction.Timestamp.Month != previousMonth)
+                        {
+                            previousMonth = transaction.Timestamp.Month;
+                            <h3 class="transaction-title">@transaction.Timestamp.ToString("MMMM yyyy")</h3>
+                        }
 
-                    <div class="transaction">
-                        <span class="date" title="@transaction.Timestamp.ToString("G")">@transaction.Timestamp.ToString("d MMM")</span>
-                        <span class="description">@transaction.Description</span>
-                        <span class="amount @(transaction.Amount < 0 ? "debit" : "credit")">
-                            @transaction.Amount.ToString("C")
-                        </span>
+                        <div class="transaction">
+                            <span class="date" title="@transaction.Timestamp.ToString("G")">@transaction.Timestamp.ToString("d MMM")</span>
+                            <span class="description">@transaction.Description</span>
+                            <span class="amount @(transaction.Amount < 0 ? "debit" : "credit")">
+                                @transaction.Amount.ToString("C")
+                            </span>
+                        </div>
                     </div>
-                </div>
-            </Virtualize>
+                </Virtualize>
+            }
         </div>
     }
 </div>
 
 @code {
     private bool isLoading = true;
+    private bool isFetching = false;
     private string selectedAccountId;
     private Account[] accounts = new Account[0];
     private Card[] creditCards = new Card[0];
@@ -72,13 +80,17 @@
 
     private async Task FetchTransactions(Guid authId, string accountId)
     {
+        isFetching = true;
         selectedAccountId = accountId;
         transactions = await _transactionLoader.Load(authId, accountId);
+        isFetching = false;
     }
 
     private async Task FetchCardTransactions(Guid authId, string accountId)
     {
+        isFetching = true;
         selectedAccountId = accountId;
         transactions = await _creditCardTransactionLoader.Load(authId, accountId);
+        isFetching = false;
     }
 }

@@ -54,7 +54,17 @@
                     TransactionId = transaction.TransactionId,
                     Timestamp = transaction.Timestamp,
                     Description = transaction.Description,
-                    Amount = transaction.Amount
+                    Amount = transaction.Amount,
+                    Currency = transaction.Currency,
+                    TransactionType = transaction.TransactionType,
+                    TransactionCategory = transaction.TransactionCategory,
+                    TransactionClassification = transaction.TransactionClassification,
+                    MerchantName = transaction.MerchantName,
+                    RunningBalance = new Spendy.Data.Models.RunningBalance()
+                    {
+                        Amount = transaction.RunningBalance.Amount,
+                        Currency = transaction.RunningBalance.Currency,
+                    },
                 });
             }
 

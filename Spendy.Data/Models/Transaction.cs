@@ -17,5 +17,17 @@
         public string Description { get; set; }
 
         public decimal Amount { get; set; }
+
+        public string Currency { get; set; }
+
+        public string TransactionType { get; set; }
+
+        public string TransactionCategory { get; set; }
+
+        public string[] TransactionClassification { get; set; }
+
+        public string MerchantName { get; set; }
+
+        public RunningBalance RunningBalance { get; set; }
     }
 }

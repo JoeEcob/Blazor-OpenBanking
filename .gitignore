@@ -370,3 +370,5 @@ AppData/
 !AppData/.gitkeep
 
 Bruno/environments/local.yml
+.env
+ActualBudgetSync/actual-data/

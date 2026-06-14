@@ -47,6 +47,9 @@
                             <span class="amount @(transaction.TransactionType.ToLower())">
                                 @transaction.Amount.ToString("C")
                             </span>
+                            <span class="running-balance">
+                                @transaction.RunningBalance?.Amount.ToString("C")
+                            </span>
                         </div>
                     </div>
                 </Virtualize>
